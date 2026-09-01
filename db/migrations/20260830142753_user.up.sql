@@ -1,0 +1,12 @@
+CREATE TYPE user_role AS ENUM ('RECRUITER', 'CANDIDATE');
+
+CREATE TABLE users(
+  id UUID DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  role user_role NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(id)
+);
