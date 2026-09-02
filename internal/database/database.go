@@ -2,6 +2,7 @@ package database
 
 import (
 	"AlfianChabib/go-job-board-api/internal/config"
+	"log"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -28,8 +29,9 @@ func OpenConnection() *gorm.DB {
 		PrepareStmt:            true,
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal("Failed to connect to database. \n", err)
 	}
+	log.Println("connected")
 
 	sqlDB, err := db.DB()
 	if err != nil {

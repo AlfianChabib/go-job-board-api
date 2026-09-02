@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/gofiber/fiber/v3/middleware/recover"
 
@@ -29,11 +30,17 @@ func main() {
 		JSONDecoder:     json.Unmarshal,
 	})
 	app.Use(recover.New())
+	app.Use(cors.New(cors.Config{
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowMethods: []string{"GET, POST, HEAD, PUT, DELETE, PATCH, QUERY"},
+		AllowOrigins: []string{"*"},
+		// AllowCredentials: true,
+	}))
 	app.Use(logger.New(logger.Config{
 		Format: "[${ip}]:${port} ${time}] ${status} - ${latency} ${method} ${path}\n",
 	}))
 
-	router.Initialize(app)
+	router.InitializeRouter(app)
 
 	log.Fatal(app.Listen(env.Port, fiber.ListenConfig{
 		EnablePrefork: true,

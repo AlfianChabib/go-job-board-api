@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Initialize(router *fiber.App) {
+func InitializeRouter(router *fiber.App) {
 	db := database.OpenConnection()
 	authRepository := repository.NewAuthRepository(db)
 	passwordHasher := utils.NewBcryptHasher(bcrypt.DefaultCost)
