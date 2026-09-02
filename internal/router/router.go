@@ -2,13 +2,17 @@ package router
 
 import (
 	"AlfianChabib/go-job-board-api/internal/controller"
+	"AlfianChabib/go-job-board-api/internal/database"
+	"AlfianChabib/go-job-board-api/internal/repository"
 	"AlfianChabib/go-job-board-api/internal/service"
 
 	"github.com/gofiber/fiber/v3"
 )
 
 func Initialize(router *fiber.App) {
-	authService := service.NewAuthService()
+	db := database.OpenConnection()
+	authRepository := repository.NewAuthRepository(db)
+	authService := service.NewAuthService(authRepository)
 	authController := controller.NewAuthController(authService)
 
 	router.Get("/", func(c fiber.Ctx) error {

@@ -17,20 +17,25 @@ func NewAuthController(authService service.AuthService) *AuthControllerImpl {
 	}
 }
 
-func (authController *AuthControllerImpl) Register(c fiber.Ctx) error {
+func (controller *AuthControllerImpl) Register(ctx fiber.Ctx) error {
 	var body web.RegisterRequest
 
-	if err := c.Bind().Body(&body); err != nil {
+	if err := ctx.Bind().Body(&body); err != nil {
 		return err
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+	user, err := controller.AuthService.Register(ctx, body)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status": fiber.StatusCreated,
-		"data":   &body,
+		"data":   user,
 	})
 }
 
-func (authController *AuthControllerImpl) Login(c fiber.Ctx) error {
+func (controller *AuthControllerImpl) Login(c fiber.Ctx) error {
 	panic("TODO: Implement")
 }
 

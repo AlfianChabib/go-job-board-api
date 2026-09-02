@@ -1,6 +1,11 @@
-package model
+package domain
 
-import "time"
+import (
+	"time"
+	"uuid"
+
+	"gorm.io/gorm"
+)
 
 type UserRole string
 
@@ -17,4 +22,17 @@ type User struct {
 	Role      UserRole  `gorm:"column:role;default:'CANDIDATE'"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateDate;<-:create"`
 	UpdatedAt time.Time `gorm:"column:created_at;autoCreateDate;autoUpdateDate"`
+}
+
+func (u *User) TableName() string {
+	return "users"
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	if u.ID == "" {
+		uuidV7 := uuid.NewV7()
+		u.ID = uuidV7.String()
+	}
+
+	return
 }

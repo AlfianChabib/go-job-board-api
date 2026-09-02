@@ -7,6 +7,7 @@ import (
 	"AlfianChabib/go-job-board-api/pkg/validator"
 	"log"
 
+	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/gofiber/fiber/v3/middleware/recover"
 
 	"github.com/gofiber/fiber/v3"
@@ -25,6 +26,9 @@ func main() {
 		ErrorHandler:    middleware.ErrorHandler,
 	})
 	app.Use(recover.New())
+	app.Use(logger.New(logger.Config{
+		Format: "[${ip}]:${port} ${time}] ${status} - ${latency} ${method} ${path}\n",
+	}))
 
 	router.Initialize(app)
 
