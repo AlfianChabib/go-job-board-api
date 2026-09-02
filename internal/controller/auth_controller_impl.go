@@ -7,17 +7,17 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-type AuthControllerImpl struct {
+type authControllerImpl struct {
 	AuthService service.AuthService
 }
 
-func NewAuthController(authService service.AuthService) *AuthControllerImpl {
-	return &AuthControllerImpl{
+func NewAuthController(authService service.AuthService) AuthController {
+	return &authControllerImpl{
 		AuthService: authService,
 	}
 }
 
-func (controller *AuthControllerImpl) Register(ctx fiber.Ctx) error {
+func (controller *authControllerImpl) Register(ctx fiber.Ctx) error {
 	var body web.RegisterRequest
 
 	if err := ctx.Bind().Body(&body); err != nil {
@@ -35,10 +35,10 @@ func (controller *AuthControllerImpl) Register(ctx fiber.Ctx) error {
 	})
 }
 
-func (controller *AuthControllerImpl) Login(c fiber.Ctx) error {
+func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 	panic("TODO: Implement")
 }
 
-func (authController *AuthControllerImpl) LogOut(c fiber.Ctx) error {
+func (a *authControllerImpl) LogOut(c fiber.Ctx) error {
 	panic("TODO: Implement")
 }

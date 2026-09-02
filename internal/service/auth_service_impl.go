@@ -4,23 +4,24 @@ import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
 	"AlfianChabib/go-job-board-api/internal/repository"
-	"AlfianChabib/go-job-board-api/pkg/utils"
 
 	"github.com/gofiber/fiber/v3"
 )
 
-type AuthServiceImpl struct {
+type authServiceImpl struct {
 	AuthRepository repository.AuthRepository
+	PasswordHasher domain.PasswordHasher
 }
 
-func NewAuthService(authRepository repository.AuthRepository) *AuthServiceImpl {
-	return &AuthServiceImpl{
+func NewAuthService(authRepository repository.AuthRepository, passwordHasher domain.PasswordHasher) AuthService {
+	return &authServiceImpl{
 		AuthRepository: authRepository,
+		PasswordHasher: passwordHasher,
 	}
 }
 
-func (service *AuthServiceImpl) Register(ctx fiber.Ctx, data web.RegisterRequest) (*domain.User, error) {
-	newHash, err := utils.HashPassword([]byte(data.Password))
+func (service *authServiceImpl) Register(ctx fiber.Ctx, data web.RegisterRequest) (*web.RegisterResponse, error) {
+	newHash, err := service.PasswordHasher.Hash([]byte(data.Password))
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
@@ -33,15 +34,20 @@ func (service *AuthServiceImpl) Register(ctx fiber.Ctx, data web.RegisterRequest
 	user, err := service.AuthRepository.Register(ctx, domain.User{
 		Name:     data.Name,
 		Email:    data.Email,
-		Password: string(newHash),
+		Password: newHash,
 	})
-	return user, err
+
+	return &web.RegisterResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}, err
 }
 
-func (a *AuthServiceImpl) Login(ctx fiber.Ctx, data web.LoginRrequest) error {
+func (a *authServiceImpl) Login(ctx fiber.Ctx, data web.LoginRrequest) error {
 	panic("TODO: Implement")
 }
 
-func (a *AuthServiceImpl) Logout(ctx fiber.Ctx) error {
+func (a *authServiceImpl) Logout(ctx fiber.Ctx) error {
 	panic("TODO: Implement")
 }

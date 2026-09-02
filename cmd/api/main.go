@@ -5,6 +5,7 @@ import (
 	"AlfianChabib/go-job-board-api/internal/middleware"
 	"AlfianChabib/go-job-board-api/internal/router"
 	"AlfianChabib/go-job-board-api/pkg/validator"
+	"encoding/json"
 	"log"
 
 	"github.com/gofiber/fiber/v3/middleware/logger"
@@ -24,6 +25,8 @@ func main() {
 	app := fiber.New(fiber.Config{
 		StructValidator: validator.NewValidator(),
 		ErrorHandler:    middleware.ErrorHandler,
+		JSONEncoder:     json.Marshal,
+		JSONDecoder:     json.Unmarshal,
 	})
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
