@@ -1,13 +1,13 @@
 package service
 
 import (
+	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
-
-	"github.com/gofiber/fiber/v3"
+	"context"
 )
 
 type AuthService interface {
-	Register(ctx fiber.Ctx, data web.RegisterRequest) (*web.RegisterResponse, error)
-	Login(ctx fiber.Ctx, data web.LoginRrequest) error
-	Logout(ctx fiber.Ctx) error
+	Register(ctx context.Context, data web.RegisterRequest) (*web.RegisterResponse, error)
+	Login(ctx context.Context, data web.LoginRrequest) (*domain.TokenPair, error)
+	Logout(ctx context.Context) error
 }

@@ -27,5 +27,5 @@ func (b *bcryptHasher) Compare(hashedPassword, password []byte) bool {
 		return false
 	}
 	err := bcrypt.CompareHashAndPassword(hashedPassword, password)
-	return err != nil
+	return err == nil
 }

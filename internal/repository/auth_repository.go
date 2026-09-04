@@ -2,11 +2,11 @@ package repository
 
 import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
-
-	"github.com/gofiber/fiber/v3"
+	"context"
 )
 
 type AuthRepository interface {
-	Register(ctx fiber.Ctx, user domain.User) (*domain.User, error)
-	IsUserAlreadyExist(ctx fiber.Ctx, email string) bool
+	Register(ctx context.Context, user domain.User) (*domain.User, error)
+	IsUserExist(ctx context.Context, email string) bool
+	FindByEmail(ctx context.Context, email string) (*domain.User, error)
 }

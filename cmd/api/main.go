@@ -40,7 +40,7 @@ func main() {
 		Format: "[${ip}]:${port} ${time}] ${status} - ${latency} ${method} ${path}\n",
 	}))
 
-	router.InitializeRouter(app)
+	router.InitializeRouter(app, env)
 
 	log.Fatal(app.Listen(env.Port, fiber.ListenConfig{
 		EnablePrefork: true,

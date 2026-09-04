@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -15,14 +14,6 @@ func ErrorHandler(c fiber.Ctx, err error) error {
 	var e *fiber.Error
 	if errors.As(err, &e) && e != nil {
 		code = e.Code
-		fmt.Println(e.Code)
-	}
-
-	if e.Message != "" && err != nil {
-		return c.Status(code).JSON(fiber.Map{
-			"success": false,
-			"message": e.Message,
-		})
 	}
 
 	var validationErrors validator.ValidationErrors
@@ -33,8 +24,6 @@ func ErrorHandler(c fiber.Ctx, err error) error {
 			out = append(out, fiber.Map{
 				"field": strings.ToLower(e.Field()),
 				"rule":  e.Tag(),
-				"value": e.Error(),
-				"param": e.Param(),
 			})
 		}
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -43,5 +32,13 @@ func ErrorHandler(c fiber.Ctx, err error) error {
 			"errors":  out,
 		})
 	}
+
+	if e.Message != "" && err != nil {
+		return c.Status(code).JSON(fiber.Map{
+			"success": false,
+			"message": e.Message,
+		})
+	}
+
 	return nil
 }

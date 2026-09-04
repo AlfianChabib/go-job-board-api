@@ -30,26 +30,31 @@ func NewJwtManager(
 }
 
 func (j *jwtManager) GenerateTokenPair(userID string, role domain.UserRole) (*domain.TokenPair, error) {
+	accessExpiredAt := time.Now().Add(time.Duration(j.AccessDuration * int(time.Second)))
+	refreshExpiredAt := time.Now().Add(time.Duration(j.RefreshDuration * int(time.Second)))
+
 	accessClaims := &domain.JwtCustomClaims{
 		UserID: userID,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(j.AccessDuration * int(time.Second)))),
+			ExpiresAt: jwt.NewNumericDate(accessExpiredAt),
 		},
 	}
-	accessToken, _ := jwt.NewWithClaims(jwt.SigningMethodES256, accessClaims).SignedString([]byte(j.AccessSecretKey))
+	accessToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString([]byte(j.AccessSecretKey))
 
 	refreshClaims := &domain.JwtCustomClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(j.RefreshDuration * int(time.Second)))),
+			ExpiresAt: jwt.NewNumericDate(refreshExpiredAt),
 		},
 	}
-	refreshToken, _ := jwt.NewWithClaims(jwt.SigningMethodES256, refreshClaims).SignedString([]byte(j.RefreshSecretKey))
+	refreshToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(j.RefreshSecretKey))
 
 	return &domain.TokenPair{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:      accessToken,
+		RefreshToken:     refreshToken,
+		AccessExpiredAt:  accessExpiredAt,
+		RefreshExpiredAt: refreshExpiredAt,
 	}, nil
 }
 
