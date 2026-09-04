@@ -7,4 +7,5 @@ import (
 
 type TokenRepository interface {
 	Save(ctx context.Context, token domain.Token) (*domain.Token, error)
+	RevokeToken(ctx context.Context, refreshToken string) error
 }

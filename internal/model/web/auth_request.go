@@ -6,7 +6,11 @@ type RegisterRequest struct {
 	Password string `json:"password" validate:"required,min=8"`
 }
 
-type LoginRrequest struct {
+type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=8"`
+}
+
+type LogOutRequest struct {
+	RefreshToken string `cookie:"refresh_token" validate:"required"`
 }

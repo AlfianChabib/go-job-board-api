@@ -8,6 +8,6 @@ import (
 
 type AuthService interface {
 	Register(ctx context.Context, data web.RegisterRequest) (*web.RegisterResponse, error)
-	Login(ctx context.Context, data web.LoginRrequest) (*domain.TokenPair, error)
-	Logout(ctx context.Context) error
+	Login(ctx context.Context, data web.LoginRequest) (*domain.TokenPair, error)
+	Logout(ctx context.Context, refreshToken string) error
 }

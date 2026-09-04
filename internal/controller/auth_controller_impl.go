@@ -41,7 +41,7 @@ func (controller *authControllerImpl) Register(c fiber.Ctx) error {
 
 func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 	ctx := c.Context()
-	var body web.LoginRrequest
+	var body web.LoginRequest
 
 	if err := c.Bind().Body(&body); err != nil {
 		return err
@@ -56,7 +56,8 @@ func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 		Name:     "refresh_token",
 		Value:    tokens.RefreshToken,
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
-		HTTPOnly: true,
+		Path:     "/",
+		HTTPOnly: controller.isProd,
 		Secure:   controller.isProd,
 		SameSite: "Strict",
 	})
@@ -67,9 +68,31 @@ func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 	})
 }
 
-func (a *authControllerImpl) LogOut(c fiber.Ctx) error {
-	// ctx := c.Context()
+func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	var data web.LogOutRequest
+	if err := c.Bind().Cookie(&data); err != nil {
+		return err
+	}
+
+	err := controller.AuthService.Logout(ctx, data.RefreshToken)
+	if err != nil {
+		return err
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Expires:  time.Now().Add(-1 * time.Hour),
+		MaxAge:   -1,
+		Path:     "/",
+		HTTPOnly: controller.isProd,
+		Secure:   controller.isProd,
+	})
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
+		"data":    "Logout Success",
 	})
 }

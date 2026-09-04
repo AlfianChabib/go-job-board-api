@@ -59,7 +59,7 @@ func (service *authServiceImpl) Register(ctx context.Context, data web.RegisterR
 	}, nil
 }
 
-func (service *authServiceImpl) Login(ctx context.Context, data web.LoginRrequest) (*domain.TokenPair, error) {
+func (service *authServiceImpl) Login(ctx context.Context, data web.LoginRequest) (*domain.TokenPair, error) {
 	user, err := service.AuthRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Wrong Password or Email")
@@ -87,6 +87,11 @@ func (service *authServiceImpl) Login(ctx context.Context, data web.LoginRreques
 	return tokens, nil
 }
 
-func (a *authServiceImpl) Logout(ctx context.Context) error {
-	panic("TODO: Implement")
+func (service *authServiceImpl) Logout(ctx context.Context, refreshToken string) error {
+	err := service.TokenRepository.RevokeToken(ctx, refreshToken)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

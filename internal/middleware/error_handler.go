@@ -10,10 +10,12 @@ import (
 
 func ErrorHandler(c fiber.Ctx, err error) error {
 	code := fiber.StatusInternalServerError
+	message := "Internal server error"
 
 	var e *fiber.Error
 	if errors.As(err, &e) && e != nil {
 		code = e.Code
+		message = e.Message
 	}
 
 	var validationErrors validator.ValidationErrors
@@ -33,10 +35,10 @@ func ErrorHandler(c fiber.Ctx, err error) error {
 		})
 	}
 
-	if e.Message != "" && err != nil {
+	if message != "" && err != nil {
 		return c.Status(code).JSON(fiber.Map{
 			"success": false,
-			"message": e.Message,
+			"message": message,
 		})
 	}
 
