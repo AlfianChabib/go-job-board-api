@@ -22,13 +22,13 @@ func NewAuthController(authService service.AuthService, env string) AuthControll
 
 func (controller *authControllerImpl) Register(c fiber.Ctx) error {
 	ctx := c.Context()
-	var body web.RegisterRequest
+	var req web.RegisterRequest
 
-	if err := c.Bind().Body(&body); err != nil {
+	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	user, err := controller.AuthService.Register(ctx, body)
+	user, err := controller.AuthService.Register(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -41,13 +41,13 @@ func (controller *authControllerImpl) Register(c fiber.Ctx) error {
 
 func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 	ctx := c.Context()
-	var body web.LoginRequest
+	var req web.LoginRequest
 
-	if err := c.Bind().Body(&body); err != nil {
+	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	tokens, err := controller.AuthService.Login(ctx, body)
+	tokens, err := controller.AuthService.Login(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -71,12 +71,12 @@ func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
 	ctx := c.Context()
 
-	var data web.LogOutRequest
-	if err := c.Bind().Cookie(&data); err != nil {
+	var req web.LogOutRequest
+	if err := c.Bind().Cookie(&req); err != nil {
 		return err
 	}
 
-	err := controller.AuthService.Logout(ctx, data.RefreshToken)
+	err := controller.AuthService.Logout(ctx, req.RefreshToken)
 	if err != nil {
 		return err
 	}
@@ -93,6 +93,34 @@ func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
-		"data":    "Logout Success",
+		"message": "Logout Success",
+	})
+}
+
+func (controller *authControllerImpl) RefreshToken(c fiber.Ctx) error {
+	ctx := c.Context()
+	var req web.RefreshTokenRequest
+	if err := c.Bind().All(&req); err != nil {
+		return err
+	}
+
+	response, err := controller.AuthService.RefreshToken(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    response.RefreshToken,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		Path:     "/",
+		HTTPOnly: controller.isProd,
+		Secure:   controller.isProd,
+		SameSite: "Strict",
+	})
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"data":    response,
 	})
 }
