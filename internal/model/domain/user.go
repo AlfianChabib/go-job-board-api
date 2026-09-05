@@ -3,7 +3,6 @@ package domain
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -37,22 +36,4 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 
 	return
-}
-
-type JwtCustomClaims struct {
-	UserID string   `json:"user_id"`
-	Role   UserRole `json:"role,omitempty"`
-	jwt.RegisteredClaims
-}
-
-type TokenPair struct {
-	AccessToken      string    `json:"access_token"`
-	RefreshToken     string    `json:"refresh_token"`
-	AccessExpiredAt  time.Time `json:"access_expired_at"`
-	RefreshExpiredAt time.Time `json:"refresh_expired_at"`
-}
-
-type JwtManager interface {
-	GenerateTokenPair(userID string, role UserRole) (*TokenPair, error)
-	ValidateToken(tokenString string) (*JwtCustomClaims, error)
 }

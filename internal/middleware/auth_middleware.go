@@ -20,9 +20,9 @@ func Protected(jwtManager domain.JwtManager) fiber.Handler {
 		}
 
 		tokenString := parts[1]
-		decodedToken, err := jwtManager.ValidateToken(tokenString)
+		decodedToken, err := jwtManager.ValidateAccessToken(tokenString)
 		if err != nil {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return fiber.NewError(fiber.StatusUnauthorized, err.Error())
 		}
 
 		c.Locals("userId", decodedToken.UserID)

@@ -5,6 +5,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/gofiber/fiber/v3/log"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -43,4 +45,22 @@ func (repo *authRepositoryImpl) FindByEmail(ctx context.Context, email string) (
 	}
 
 	return &user, nil
+}
+
+func (repo *authRepositoryImpl) FindTokenWithUser(ctx context.Context, userId uuid.UUID, refreshToken string) (*domain.Token, error) {
+	var token domain.Token
+	err := repo.db.WithContext(ctx).
+		Where("refresh_token = ? AND user_id = ? AND is_revoked = ?", refreshToken, userId, false).
+		Preload("User").
+		First(&token).Error
+	if err != nil {
+		log.Info(err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("token tidak valid atau sudah dicabut")
+		}
+
+		return nil, err
+	}
+
+	return &token, nil
 }

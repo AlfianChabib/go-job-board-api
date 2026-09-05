@@ -14,3 +14,8 @@ type LoginRequest struct {
 type LogOutRequest struct {
 	RefreshToken string `cookie:"refresh_token" validate:"required"`
 }
+
+type RefreshTokenRequest struct {
+	RefreshToken string `cookie:"refresh_token" json:"refresh_token" validate:"required"`
+	AccessToken  string `header:"authorization" json:"access_token" validate:"required"`
+}

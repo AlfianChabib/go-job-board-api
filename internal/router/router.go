@@ -14,24 +14,26 @@ import (
 
 func InitializeRouter(router *fiber.App, env *config.Env) {
 	db := database.OpenConnection()
+
+	// repository
 	authRepository := repository.NewAuthRepository(db)
 	tokenRepository := repository.NewTokenRepository(db)
 
+	// utils
 	passwordHasher := utils.NewBcryptHasher(bcrypt.DefaultCost)
 	jwtManager := utils.NewJwtManager(env.AccessSecretKey, env.AccessDuration, env.RefreshSecretKey, env.RefreshDuration)
 
+	// service
 	authService := service.NewAuthService(authRepository, passwordHasher, jwtManager, tokenRepository)
 	authController := controller.NewAuthController(authService, env.AppEnv)
+
+	// middleware
+	// protected := middleware.Protected(jwtManager)
 
 	router.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
 	api := router.Group("/api")
-	auth := api.Group("/auth")
-	{
-		auth.Post("/register", authController.Register)
-		auth.Post("/login", authController.Login)
-		auth.Post("/logout", authController.LogOut)
-	}
+	SetupAuthRoutes(api, authController)
 }

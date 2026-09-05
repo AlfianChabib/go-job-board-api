@@ -70,7 +70,7 @@ func (service *authServiceImpl) Login(ctx context.Context, data web.LoginRequest
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Wrong Password or Email")
 	}
 
-	tokens, err := service.JwtManager.GenerateTokenPair(user.ID.String(), user.Role)
+	tokens, err := service.JwtManager.GenerateTokenPair(user.ID, user.Role)
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal server error")
 	}
@@ -94,4 +94,37 @@ func (service *authServiceImpl) Logout(ctx context.Context, refreshToken string)
 	}
 
 	return nil
+}
+
+func (service *authServiceImpl) RefreshToken(ctx context.Context, data web.RefreshTokenRequest) (*web.RefreshTokenResponse, error) {
+	decodedToken, err := service.JwtManager.ValidateRefreshToken(data.RefreshToken)
+	if err != nil {
+		return nil, fiber.NewError(fiber.StatusUnauthorized, err.Error())
+	}
+
+	userWithToken, err := service.AuthRepository.FindTokenWithUser(ctx, decodedToken.UserID, data.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	newTokens, err := service.JwtManager.GenerateTokenPair(userWithToken.User.ID, userWithToken.User.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	err = service.TokenRepository.RevokeToken(ctx, data.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = service.TokenRepository.Save(ctx, domain.Token{
+		UserId:       userWithToken.User.ID,
+		RefreshToken: newTokens.RefreshToken,
+		ExpiresAt:    newTokens.RefreshExpiredAt,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &web.RefreshTokenResponse{TokenPair: newTokens}, nil
 }

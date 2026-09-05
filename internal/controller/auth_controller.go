@@ -6,4 +6,5 @@ type AuthController interface {
 	Register(c fiber.Ctx) error
 	Login(c fiber.Ctx) error
 	LogOut(c fiber.Ctx) error
+	RefreshToken(c fiber.Ctx) error
 }
