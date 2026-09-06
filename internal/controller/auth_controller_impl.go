@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"AlfianChabib/go-job-board-api/internal/helper/response"
 	"AlfianChabib/go-job-board-api/internal/model/web"
 	"AlfianChabib/go-job-board-api/internal/service"
 	"time"
@@ -33,10 +34,7 @@ func (controller *authControllerImpl) Register(c fiber.Ctx) error {
 		return err
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"status": fiber.StatusCreated,
-		"data":   user,
-	})
+	return response.OK(c, "Register Success", user)
 }
 
 func (controller *authControllerImpl) Login(c fiber.Ctx) error {
@@ -62,10 +60,7 @@ func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 		SameSite: "Strict",
 	})
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"success": true,
-		"data":    tokens,
-	})
+	return response.Success(c, fiber.StatusOK, "Login success", tokens)
 }
 
 func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
@@ -91,10 +86,7 @@ func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
 		Secure:   controller.isProd,
 	})
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"success": true,
-		"message": "Logout Success",
-	})
+	return response.Message(c, fiber.StatusOK, "Logout Success")
 }
 
 func (controller *authControllerImpl) RefreshToken(c fiber.Ctx) error {
@@ -104,14 +96,14 @@ func (controller *authControllerImpl) RefreshToken(c fiber.Ctx) error {
 		return err
 	}
 
-	response, err := controller.AuthService.RefreshToken(ctx, req)
+	tokens, err := controller.AuthService.RefreshToken(ctx, req)
 	if err != nil {
 		return err
 	}
 
 	c.Cookie(&fiber.Cookie{
 		Name:     "refresh_token",
-		Value:    response.RefreshToken,
+		Value:    tokens.RefreshToken,
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
 		Path:     "/",
 		HTTPOnly: controller.isProd,
@@ -119,8 +111,5 @@ func (controller *authControllerImpl) RefreshToken(c fiber.Ctx) error {
 		SameSite: "Strict",
 	})
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"success": true,
-		"data":    response,
-	})
+	return response.Success(c, fiber.StatusOK, "Success refresh token", tokens)
 }

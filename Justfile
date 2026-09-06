@@ -13,3 +13,6 @@ up:
 
 down:
   docker compose down
+
+wire:
+  wire ./cmd/api

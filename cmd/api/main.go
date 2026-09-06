@@ -16,11 +16,14 @@ import (
 )
 
 func NewApp(env *config.Env, authController controller.AuthController) *fiber.App {
+	validator := validator.NewValidator()
+
 	app := fiber.New(fiber.Config{
-		StructValidator: validator.NewValidator(),
-		ErrorHandler:    middleware.ErrorHandler,
-		JSONEncoder:     json.Marshal,
-		JSONDecoder:     json.Unmarshal,
+		StructValidator: validator,
+		// ErrorHandler:    middleware.ErrorHandler,
+		ErrorHandler: middleware.NewCustomErrorHandler(validator),
+		JSONEncoder:  json.Marshal,
+		JSONDecoder:  json.Unmarshal,
 	})
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
