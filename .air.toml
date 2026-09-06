@@ -8,7 +8,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ./cmd/api/main.go"
+  cmd = "go build -o ./tmp/main ./cmd/api"
   delay = 1000
   entrypoint = ["./tmp/main"]
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
@@ -35,7 +35,7 @@ tmp_dir = "tmp"
   [build.windows]
     args_bin = []
     bin = "tmp\\main.exe"
-    cmd = "go build -o ./tmp/main.exe ./cmd/api/main.go"
+    cmd = "go build -o ./tmp/main.exe ./cmd/api"
     entrypoint = ["tmp\\main.exe"]
     full_bin = ""
     post_cmd = []

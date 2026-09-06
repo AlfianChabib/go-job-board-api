@@ -16,12 +16,7 @@ import (
 // migrate -database "postgres://postgres:postgres@localhost:5432/job-board-db?sslmode=disable" -path db/migrations version
 // migrate -database "postgres://postgres:postgres@localhost:5432/job-board-db?sslmode=disable" -path db/migrations force [version]
 
-func OpenConnection() *gorm.DB {
-	env, err := config.LoadEnv()
-	if err != nil {
-		panic(err)
-	}
-
+func OpenConnection(env *config.Env) *gorm.DB {
 	dsn := env.DatabaseUrl
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Info),

@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
 
@@ -21,13 +19,13 @@ type Env struct {
 	RefreshDuration  int
 }
 
-func LoadEnv() (*Env, error) {
+func LoadEnv() *Env {
 	config := viper.New()
 	config.SetConfigFile(".env")
 
 	err := config.ReadInConfig()
 	if err != nil {
-		log.Println("Warning: .env file not found, using environment variables")
+		panic(err)
 	}
 
 	var env *Env = &Env{
@@ -45,5 +43,5 @@ func LoadEnv() (*Env, error) {
 		RefreshDuration:  config.GetInt("REFRESH_DURATION"), // second
 	}
 
-	return env, nil
+	return env
 }
