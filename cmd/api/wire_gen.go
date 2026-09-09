@@ -10,10 +10,12 @@ import (
 	"AlfianChabib/go-job-board-api/internal/config"
 	"AlfianChabib/go-job-board-api/internal/controller"
 	"AlfianChabib/go-job-board-api/internal/database"
+	"AlfianChabib/go-job-board-api/internal/middleware"
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/repository"
 	"AlfianChabib/go-job-board-api/internal/service"
 	"AlfianChabib/go-job-board-api/pkg/utils"
+	"AlfianChabib/go-job-board-api/pkg/validator"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
 	"golang.org/x/crypto/bcrypt"
@@ -22,14 +24,19 @@ import (
 // Injectors from wire.go:
 
 func InitializeApp(env *config.Env) (*fiber.App, error) {
+	structValidator := validator.NewValidator()
+	jwtManager := ProvideJwtManager(env)
+	v := middleware.Protected(jwtManager)
 	db := database.OpenConnection(env)
 	authRepository := repository.NewAuthRepository(db)
 	passwordHasher := ProvideBcryptHasher()
-	jwtManager := ProvideJwtManager(env)
 	tokenRepository := repository.NewTokenRepository(db)
 	authService := service.NewAuthService(authRepository, passwordHasher, jwtManager, tokenRepository)
 	authController := ProvideAuthController(authService, env)
-	app := NewApp(env, authController)
+	candidateRepository := repository.NewCandidateRepository(db)
+	candidateService := service.NewCandidateService(candidateRepository)
+	candidateController := ProvideCandidateController(candidateService)
+	app := NewApp(env, structValidator, v, authController, candidateController)
 	return app, nil
 }
 
@@ -52,6 +59,12 @@ func ProvideAuthController(authService service.AuthService, env *config.Env) con
 	return controller.NewAuthController(authService, env.AppEnv)
 }
 
+func ProvideCandidateController(candidateService service.CandidateService) controller.CandidateController {
+	return controller.NewCandidateController(candidateService)
+}
+
 var authSet = wire.NewSet(repository.NewAuthRepository, repository.NewTokenRepository, ProvideBcryptHasher,
-	ProvideJwtManager, service.NewAuthService, ProvideAuthController,
+	ProvideJwtManager, service.NewAuthService, ProvideAuthController, middleware.Protected,
 )
+
+var candidateSet = wire.NewSet(repository.NewCandidateRepository, service.NewCandidateService, ProvideCandidateController)

@@ -10,8 +10,8 @@ import (
 type UserRole string
 
 const (
-	RoleAdmin UserRole = "RECRUITER"
-	RoleUser  UserRole = "CANDIDATE"
+	RoleRecruiter UserRole = "RECRUITER"
+	RoleCandidate UserRole = "CANDIDATE"
 )
 
 type User struct {
@@ -20,9 +20,10 @@ type User struct {
 	Email     string    `gorm:"column:email;unique"`
 	Role      UserRole  `gorm:"column:role;default:'CANDIDATE'"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateDate;<-:create"`
-	UpdatedAt time.Time `gorm:"column:created_at;autoCreateDate;autoUpdateDate"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateDate;autoUpdateDate"`
 	Auth      Auth      `gorm:"foreignKey:UserId;references:ID"`
 	Tokens    []Token   `gorm:"foreignKey:UserId;references:ID"`
+	Profile   *Profile  `gorm:"foreignKey:UserId;references:ID"`
 }
 
 func (u *User) TableName() string {

@@ -47,6 +47,7 @@ func (service *authServiceImpl) Register(ctx context.Context, data web.RegisterR
 			Email:    data.Email,
 			Password: newHash,
 		},
+		Profile: &domain.Profile{},
 	})
 	if err != nil {
 		return nil, err
@@ -56,6 +57,7 @@ func (service *authServiceImpl) Register(ctx context.Context, data web.RegisterR
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
+		Role:  user.Role,
 	}, nil
 }
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/log"
 )
 
 func ErrorHandler(c fiber.Ctx, err error) error {
@@ -42,6 +43,7 @@ func ErrorHandler(c fiber.Ctx, err error) error {
 
 func NewCustomErrorHandler(v customValidator.StructValidator) fiber.ErrorHandler {
 	return func(c fiber.Ctx, err error) error {
+		log.Error(err)
 		if valErrs, ok := errors.AsType[validator.ValidationErrors](err); ok {
 			formattedErrors := v.FormatValidationErrors(valErrs)
 			return response.ValidationError(c, "Validation failed", formattedErrors)

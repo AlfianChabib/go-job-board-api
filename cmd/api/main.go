@@ -15,15 +15,18 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/recover"
 )
 
-func NewApp(env *config.Env, authController controller.AuthController) *fiber.App {
-	validator := validator.NewValidator()
-
+func NewApp(
+	env *config.Env,
+	validate validator.StructValidator,
+	protected fiber.Handler,
+	authController controller.AuthController,
+	candidateController controller.CandidateController,
+) *fiber.App {
 	app := fiber.New(fiber.Config{
-		StructValidator: validator,
-		// ErrorHandler:    middleware.ErrorHandler,
-		ErrorHandler: middleware.NewCustomErrorHandler(validator),
-		JSONEncoder:  json.Marshal,
-		JSONDecoder:  json.Unmarshal,
+		StructValidator: validate,
+		ErrorHandler:    middleware.NewCustomErrorHandler(validate),
+		JSONEncoder:     json.Marshal,
+		JSONDecoder:     json.Unmarshal,
 	})
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
@@ -35,7 +38,7 @@ func NewApp(env *config.Env, authController controller.AuthController) *fiber.Ap
 		AllowOrigins: []string{"*"},
 	}))
 
-	router.InitializeRoutes(app, env, authController)
+	router.InitializeRoutes(app, env, protected, authController, candidateController)
 
 	return app
 }

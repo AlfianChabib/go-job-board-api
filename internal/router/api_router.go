@@ -10,7 +10,9 @@ import (
 func InitializeRoutes(
 	router *fiber.App,
 	env *config.Env,
+	protected fiber.Handler,
 	authController controller.AuthController,
+	candidateController controller.CandidateController,
 ) {
 	router.Get("/", func(c fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -21,5 +23,6 @@ func InitializeRoutes(
 
 	api := router.Group("/api")
 	SetupAuthRoutes(api, authController)
+	SetupCandidateRoutes(api, protected, candidateController)
 	SetupUserRoutes(api)
 }

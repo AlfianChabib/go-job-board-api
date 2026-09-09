@@ -10,7 +10,9 @@ import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/repository"
 	"AlfianChabib/go-job-board-api/internal/service"
+	"AlfianChabib/go-job-board-api/internal/middleware"
 	"AlfianChabib/go-job-board-api/pkg/utils"
+	"AlfianChabib/go-job-board-api/pkg/validator"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
@@ -34,6 +36,10 @@ func ProvideAuthController(authService service.AuthService, env *config.Env) con
 	return controller.NewAuthController(authService, env.AppEnv)
 }
 
+func ProvideCandidateController(candidateService service.CandidateService) controller.CandidateController {
+	return controller.NewCandidateController(candidateService)
+}
+
 var authSet = wire.NewSet(
 	repository.NewAuthRepository,
 	repository.NewTokenRepository,
@@ -41,12 +47,21 @@ var authSet = wire.NewSet(
 	ProvideJwtManager,
 	service.NewAuthService,
 	ProvideAuthController,
+	middleware.Protected,
+)
+
+var candidateSet = wire.NewSet(
+	repository.NewCandidateRepository,
+	service.NewCandidateService,
+	ProvideCandidateController,
 )
 
 func InitializeApp(env *config.Env) (*fiber.App, error) {
 	wire.Build(
 		database.OpenConnection,
+		validator.NewValidator,
 		authSet,
+		candidateSet,
 		NewApp,
 	)
 	return nil, nil

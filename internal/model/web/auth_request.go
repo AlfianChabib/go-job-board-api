@@ -1,9 +1,12 @@
 package web
 
+import "AlfianChabib/go-job-board-api/internal/model/domain"
+
 type RegisterRequest struct {
-	Name     string `json:"name" validate:"required,min=3,max=255"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	Name     string          `json:"name" validate:"required,min=3,max=255"`
+	Email    string          `json:"email" validate:"required,email"`
+	Password string          `json:"password" validate:"required,min=8"`
+	Role     domain.UserRole `json:"role" validate:"required,oneof=RECRUITER CANDIDATE"`
 }
 
 type LoginRequest struct {

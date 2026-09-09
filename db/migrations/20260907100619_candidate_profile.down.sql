@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS experiences;
+DROP TABLE IF EXISTS profile_skills;
+DROP TABLE IF EXISTS skills;
+DROP TABLE IF EXISTS profiles;

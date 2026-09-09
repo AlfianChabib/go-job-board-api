@@ -9,19 +9,19 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-type authControllerImpl struct {
+type authController struct {
 	AuthService service.AuthService
 	isProd      bool
 }
 
 func NewAuthController(authService service.AuthService, env string) AuthController {
-	return &authControllerImpl{
+	return &authController{
 		AuthService: authService,
 		isProd:      env == "production",
 	}
 }
 
-func (controller *authControllerImpl) Register(c fiber.Ctx) error {
+func (controller *authController) Register(c fiber.Ctx) error {
 	ctx := c.Context()
 	var req web.RegisterRequest
 
@@ -37,7 +37,7 @@ func (controller *authControllerImpl) Register(c fiber.Ctx) error {
 	return response.OK(c, "Register Success", user)
 }
 
-func (controller *authControllerImpl) Login(c fiber.Ctx) error {
+func (controller *authController) Login(c fiber.Ctx) error {
 	ctx := c.Context()
 	var req web.LoginRequest
 
@@ -63,7 +63,7 @@ func (controller *authControllerImpl) Login(c fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Login success", tokens)
 }
 
-func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
+func (controller *authController) LogOut(c fiber.Ctx) error {
 	ctx := c.Context()
 
 	var req web.LogOutRequest
@@ -89,7 +89,7 @@ func (controller *authControllerImpl) LogOut(c fiber.Ctx) error {
 	return response.Message(c, fiber.StatusOK, "Logout Success")
 }
 
-func (controller *authControllerImpl) RefreshToken(c fiber.Ctx) error {
+func (controller *authController) RefreshToken(c fiber.Ctx) error {
 	ctx := c.Context()
 	var req web.RefreshTokenRequest
 	if err := c.Bind().All(&req); err != nil {
