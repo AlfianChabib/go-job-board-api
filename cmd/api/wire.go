@@ -7,10 +7,10 @@ import (
 	"AlfianChabib/go-job-board-api/internal/config"
 	"AlfianChabib/go-job-board-api/internal/controller"
 	"AlfianChabib/go-job-board-api/internal/database"
+	"AlfianChabib/go-job-board-api/internal/middleware"
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/repository"
 	"AlfianChabib/go-job-board-api/internal/service"
-	"AlfianChabib/go-job-board-api/internal/middleware"
 	"AlfianChabib/go-job-board-api/pkg/utils"
 	"AlfianChabib/go-job-board-api/pkg/validator"
 
@@ -43,11 +43,8 @@ func ProvideCandidateController(candidateService service.CandidateService) contr
 var authSet = wire.NewSet(
 	repository.NewAuthRepository,
 	repository.NewTokenRepository,
-	ProvideBcryptHasher,
-	ProvideJwtManager,
 	service.NewAuthService,
 	ProvideAuthController,
-	middleware.Protected,
 )
 
 var candidateSet = wire.NewSet(
@@ -60,6 +57,9 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	wire.Build(
 		database.OpenConnection,
 		validator.NewValidator,
+		ProvideBcryptHasher,
+		ProvideJwtManager,
+		middleware.NewMiddleware,
 		authSet,
 		candidateSet,
 		NewApp,

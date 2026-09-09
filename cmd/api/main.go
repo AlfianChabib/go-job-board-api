@@ -18,7 +18,7 @@ import (
 func NewApp(
 	env *config.Env,
 	validate validator.StructValidator,
-	protected fiber.Handler,
+	mw middleware.Middleware,
 	authController controller.AuthController,
 	candidateController controller.CandidateController,
 ) *fiber.App {
@@ -38,7 +38,7 @@ func NewApp(
 		AllowOrigins: []string{"*"},
 	}))
 
-	router.InitializeRoutes(app, env, protected, authController, candidateController)
+	router.InitializeRoutes(app, env, mw, authController, candidateController)
 
 	return app
 }

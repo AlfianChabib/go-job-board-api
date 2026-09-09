@@ -26,7 +26,7 @@ import (
 func InitializeApp(env *config.Env) (*fiber.App, error) {
 	structValidator := validator.NewValidator()
 	jwtManager := ProvideJwtManager(env)
-	v := middleware.Protected(jwtManager)
+	middlewareMiddleware := middleware.NewMiddleware(jwtManager)
 	db := database.OpenConnection(env)
 	authRepository := repository.NewAuthRepository(db)
 	passwordHasher := ProvideBcryptHasher()
@@ -36,7 +36,7 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	candidateRepository := repository.NewCandidateRepository(db)
 	candidateService := service.NewCandidateService(candidateRepository)
 	candidateController := ProvideCandidateController(candidateService)
-	app := NewApp(env, structValidator, v, authController, candidateController)
+	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController)
 	return app, nil
 }
 
@@ -63,8 +63,6 @@ func ProvideCandidateController(candidateService service.CandidateService) contr
 	return controller.NewCandidateController(candidateService)
 }
 
-var authSet = wire.NewSet(repository.NewAuthRepository, repository.NewTokenRepository, ProvideBcryptHasher,
-	ProvideJwtManager, service.NewAuthService, ProvideAuthController, middleware.Protected,
-)
+var authSet = wire.NewSet(repository.NewAuthRepository, repository.NewTokenRepository, service.NewAuthService, ProvideAuthController)
 
 var candidateSet = wire.NewSet(repository.NewCandidateRepository, service.NewCandidateService, ProvideCandidateController)

@@ -3,6 +3,7 @@ package router
 import (
 	"AlfianChabib/go-job-board-api/internal/config"
 	"AlfianChabib/go-job-board-api/internal/controller"
+	"AlfianChabib/go-job-board-api/internal/middleware"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -10,7 +11,7 @@ import (
 func InitializeRoutes(
 	router *fiber.App,
 	env *config.Env,
-	protected fiber.Handler,
+	middleware middleware.Middleware,
 	authController controller.AuthController,
 	candidateController controller.CandidateController,
 ) {
@@ -23,6 +24,6 @@ func InitializeRoutes(
 
 	api := router.Group("/api")
 	SetupAuthRoutes(api, authController)
-	SetupCandidateRoutes(api, protected, candidateController)
+	SetupCandidateRoutes(api, middleware, candidateController)
 	SetupUserRoutes(api)
 }

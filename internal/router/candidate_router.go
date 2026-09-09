@@ -2,13 +2,19 @@ package router
 
 import (
 	"AlfianChabib/go-job-board-api/internal/controller"
+	"AlfianChabib/go-job-board-api/internal/middleware"
 
 	"github.com/gofiber/fiber/v3"
 )
 
-func SetupCandidateRoutes(router fiber.Router, protected fiber.Handler, candidateController controller.CandidateController) {
+func SetupCandidateRoutes(
+	router fiber.Router,
+	middleware middleware.Middleware,
+	candidateController controller.CandidateController,
+) {
 	candidate := router.Group("/candidate")
-	candidate.Use(protected)
+	candidate.Use(middleware.Protected())
+	candidate.Use(middleware.RequireRoles("CANDIDATE"))
 
 	candidate.Get("/", candidateController.Get)
 	candidate.Put("/", candidateController.Update)
