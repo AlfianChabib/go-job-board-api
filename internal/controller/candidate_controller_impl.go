@@ -119,3 +119,13 @@ func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
 
 	return response.OK(c, "Success upload avatar", responseUrl)
 }
+
+func (controller *candidateController) DeleteAvatar(c fiber.Ctx) error {
+	userId := c.Locals("userId").(uuid.UUID)
+	ctx := c.Context()
+	err := controller.candidateService.DeleteAvatar(ctx, userId)
+	if err != nil {
+		return err
+	}
+	return response.Message(c, fiber.StatusOK, "Success delete avatar")
+}

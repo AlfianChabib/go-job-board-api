@@ -50,5 +50,9 @@ func (repo *storageRepository) UploadAvatar(ctx context.Context, fileName string
 }
 
 func (repo *storageRepository) DeleteAvatar(ctx context.Context, fileName string) error {
-	panic("TODO: Implement")
+	err := repo.store.RemoveObject(ctx, repo.avatarBucket, fileName, minio.RemoveObjectOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

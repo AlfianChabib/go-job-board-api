@@ -19,4 +19,5 @@ func SetupCandidateRoutes(
 	candidate.Get("/", candidateController.Get)
 	candidate.Put("/", candidateController.Update)
 	candidate.Patch("/avatar", candidateController.UpdateAvatar)
+	candidate.Delete("/avatar", candidateController.DeleteAvatar)
 }

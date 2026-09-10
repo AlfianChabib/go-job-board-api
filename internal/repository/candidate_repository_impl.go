@@ -43,11 +43,22 @@ func (repo *candidateRepository) Update(ctx context.Context, candidate domain.Pr
 }
 
 func (repo *candidateRepository) UploadAvatar(ctx context.Context, userId uuid.UUID, avatarUrl string) error {
-	var profile domain.Profile
 	err := repo.db.WithContext(ctx).
-		Model(&profile).
+		Model(&domain.Profile{}).
 		Where("user_id = ?", userId).
 		Update("avatar_url", avatarUrl).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *candidateRepository) DeleteAvatar(ctx context.Context, userId uuid.UUID) error {
+	err := repo.db.WithContext(ctx).
+		Model(&domain.Profile{}).
+		Where("user_id = ?", userId).
+		Update("avatar_url", nil).Error
 	if err != nil {
 		return err
 	}

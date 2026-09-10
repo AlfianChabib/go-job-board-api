@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -58,7 +59,7 @@ func (service *candidateService) Update(ctx context.Context, candidate domain.Pr
 }
 
 func (service *candidateService) UploadAvatar(ctx context.Context, req web.UpdateCandidateAvatarRequest) (*string, error) {
-	fileName := fmt.Sprintf("avatar/%s_%d%s", req.UserId, time.Now().Unix(), req.Extension)
+	fileName := fmt.Sprintf("%s_%d%s", req.UserId, time.Now().Unix(), req.Extension)
 
 	avatarUrl, err := service.storageRepo.UploadAvatar(ctx, fileName, req.File, req.FileSize, req.ContenType)
 	if err != nil {
@@ -71,4 +72,25 @@ func (service *candidateService) UploadAvatar(ctx context.Context, req web.Updat
 	}
 
 	return avatarUrl, nil
+}
+
+func (service *candidateService) DeleteAvatar(ctx context.Context, userId uuid.UUID) error {
+	candidate, err := service.repository.Get(ctx, userId)
+	if err != nil {
+		return errors.New("internal server error")
+	}
+
+	avatarUrl := *candidate.AvatarUrl
+	avatarFileName := strings.Split(avatarUrl, "avatar/")[1]
+	err = service.storageRepo.DeleteAvatar(ctx, avatarFileName)
+	if err != nil {
+		return errors.New("internal server error")
+	}
+
+	err = service.repository.DeleteAvatar(ctx, userId)
+	if err != nil {
+		return errors.New("internal server error")
+	}
+
+	return nil
 }
