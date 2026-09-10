@@ -7,4 +7,5 @@ import (
 type CandidateController interface {
 	Get(c fiber.Ctx) error
 	Update(c fiber.Ctx) error
+	UpdateAvatar(c fiber.Ctx) error
 }

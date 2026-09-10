@@ -18,6 +18,7 @@ import (
 	"AlfianChabib/go-job-board-api/pkg/validator"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
+	"github.com/minio/minio-go/v7"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -34,7 +35,9 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	authService := service.NewAuthService(authRepository, passwordHasher, jwtManager, tokenRepository)
 	authController := ProvideAuthController(authService, env)
 	candidateRepository := repository.NewCandidateRepository(db)
-	candidateService := service.NewCandidateService(candidateRepository)
+	client := database.OpenMinioClient(env)
+	storageRepository := ProvideStoragerepository(client, env)
+	candidateService := service.NewCandidateService(candidateRepository, storageRepository)
 	candidateController := ProvideCandidateController(candidateService)
 	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController)
 	return app, nil
@@ -63,6 +66,10 @@ func ProvideCandidateController(candidateService service.CandidateService) contr
 	return controller.NewCandidateController(candidateService)
 }
 
+func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
+	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
+}
+
 var authSet = wire.NewSet(repository.NewAuthRepository, repository.NewTokenRepository, service.NewAuthService, ProvideAuthController)
 
-var candidateSet = wire.NewSet(repository.NewCandidateRepository, service.NewCandidateService, ProvideCandidateController)
+var candidateSet = wire.NewSet(repository.NewCandidateRepository, ProvideStoragerepository, service.NewCandidateService, ProvideCandidateController)

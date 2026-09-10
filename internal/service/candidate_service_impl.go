@@ -6,17 +6,21 @@ import (
 	"AlfianChabib/go-job-board-api/internal/repository"
 	"context"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type candidateService struct {
-	repository repository.CandidateRepository
+	repository  repository.CandidateRepository
+	storageRepo repository.StorageRepository
 }
 
-func NewCandidateService(repo repository.CandidateRepository) CandidateService {
+func NewCandidateService(repo repository.CandidateRepository, storageRepo repository.StorageRepository) CandidateService {
 	return &candidateService{
-		repository: repo,
+		repository:  repo,
+		storageRepo: storageRepo,
 	}
 }
 
@@ -51,4 +55,20 @@ func (service *candidateService) Update(ctx context.Context, candidate domain.Pr
 		Headline: data.Headline,
 		Phone:    data.Phone,
 	}, nil
+}
+
+func (service *candidateService) UploadAvatar(ctx context.Context, req web.UpdateCandidateAvatarRequest) (*string, error) {
+	fileName := fmt.Sprintf("avatar/%s_%d%s", req.UserId, time.Now().Unix(), req.Extension)
+
+	avatarUrl, err := service.storageRepo.UploadAvatar(ctx, fileName, req.File, req.FileSize, req.ContenType)
+	if err != nil {
+		return nil, err
+	}
+
+	err = service.repository.UploadAvatar(ctx, req.UserId, *avatarUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	return avatarUrl, nil
 }
