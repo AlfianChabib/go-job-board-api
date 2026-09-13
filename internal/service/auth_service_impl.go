@@ -1,10 +1,11 @@
 package service
 
 import (
+	"context"
+
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
 	"AlfianChabib/go-job-board-api/internal/repository"
-	"context"
 
 	"github.com/gofiber/fiber/v3"
 )

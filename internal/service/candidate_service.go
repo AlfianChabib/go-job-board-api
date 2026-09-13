@@ -13,4 +13,5 @@ type CandidateService interface {
 	Update(ctx context.Context, candidate domain.Profile) (*web.UpdateCandidateResponse, error)
 	UploadAvatar(ctx context.Context, req web.UpdateCandidateAvatarRequest) (*string, error)
 	DeleteAvatar(ctx context.Context, userId uuid.UUID) error
+	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error)
 }

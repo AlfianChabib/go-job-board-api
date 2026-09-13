@@ -9,4 +9,5 @@ type CandidateController interface {
 	Update(c fiber.Ctx) error
 	UpdateAvatar(c fiber.Ctx) error
 	DeleteAvatar(c fiber.Ctx) error
+	UpdateSkills(c fiber.Ctx) error
 }

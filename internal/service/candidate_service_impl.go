@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type candidateService struct {
@@ -93,4 +95,16 @@ func (service *candidateService) DeleteAvatar(ctx context.Context, userId uuid.U
 	}
 
 	return nil
+}
+
+func (service *candidateService) UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error) {
+	updatedSkills, err := service.repository.UpdateSkills(ctx, userId, skills)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fiber.NewError(fiber.StatusNotFound, "Candidate profile not found")
+		}
+		return nil, errors.New("internal server error")
+	}
+
+	return updatedSkills, nil
 }

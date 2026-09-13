@@ -129,3 +129,23 @@ func (controller *candidateController) DeleteAvatar(c fiber.Ctx) error {
 	}
 	return response.Message(c, fiber.StatusOK, "Success delete avatar")
 }
+
+func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
+	userId, ok := c.Locals("userId").(uuid.UUID)
+	if !ok || userId == uuid.Nil {
+		return fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	var req web.UpdateCandidateSkillsRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return err
+	}
+	ctx := c.Context()
+
+	skills, err := controller.candidateService.UpdateSkills(ctx, userId, req)
+	if err != nil {
+		return err
+	}
+
+	return response.OK(c, "Success update skills", skills)
+}

@@ -22,3 +22,7 @@ type UpdateCandidateAvatarRequest struct {
 	ContenType string
 	Extension  string
 }
+
+type UpdateCandidateSkillsRequest struct {
+	Skills []string `json:"skills" validate:"required,dive,min=1"`
+}
