@@ -24,5 +24,10 @@ type UpdateCandidateAvatarRequest struct {
 }
 
 type UpdateCandidateSkillsRequest struct {
-	Skills []string `json:"skills" validate:"required,dive,min=1"`
+	Skills []SkillRequest `json:"skills" validate:"required,min=1,dive"`
+}
+
+type SkillRequest struct {
+	Id   *uuid.UUID `json:"id,omitempty"`
+	Name string     `json:"name" validate:"required"`
 }

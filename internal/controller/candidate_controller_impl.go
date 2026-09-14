@@ -140,8 +140,8 @@ func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
-	ctx := c.Context()
 
+	ctx := c.Context()
 	skills, err := controller.candidateService.UpdateSkills(ctx, userId, req)
 	if err != nil {
 		return err

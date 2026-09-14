@@ -73,31 +73,26 @@ func (repo *candidateRepository) DeleteAvatar(ctx context.Context, userId uuid.U
 
 func (repo *candidateRepository) UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error) {
 	var finalSkills []domain.Skill
-
 	err := repo.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var profile domain.Profile
 		if err := tx.Where("user_id = ?", userId).Take(&profile).Error; err != nil {
 			return err
 		}
 
-		var uniqueNames []string
-		var lowerNames []string
-		seen := make(map[string]bool)
-
-		for _, s := range skills.Skills {
-			trimmed := strings.TrimSpace(s)
-			if trimmed == "" {
-				continue
-			}
-			lower := strings.ToLower(trimmed)
-			if !seen[lower] {
-				seen[lower] = true
-				uniqueNames = append(uniqueNames, trimmed)
-				lowerNames = append(lowerNames, lower)
+		var skillsWithId []domain.Skill
+		var newSkillNames []string
+		for _, req := range skills.Skills {
+			if req.Id != nil && *req.Id != uuid.Nil {
+				skillsWithId = append(skillsWithId, domain.Skill{
+					ID:   *req.Id,
+					Name: req.Name,
+				})
+			} else {
+				newSkillNames = append(newSkillNames, strings.ToLower(req.Name))
 			}
 		}
 
-		if len(uniqueNames) == 0 {
+		if len(skillsWithId) == 0 && len(newSkillNames) == 0 {
 			if err := tx.Model(&profile).Association("Skills").Clear(); err != nil {
 				return err
 			}
@@ -105,51 +100,44 @@ func (repo *candidateRepository) UpdateSkills(ctx context.Context, userId uuid.U
 			return nil
 		}
 
-		// Look for existing skills in database
-		var existingSkills []domain.Skill
-		if err := tx.Where("LOWER(name) IN ?", lowerNames).Find(&existingSkills).Error; err != nil {
-			return err
-		}
-
-		existingMap := make(map[string]domain.Skill)
-		for _, es := range existingSkills {
-			existingMap[strings.ToLower(es.Name)] = es
-		}
-
-		// Insert new skills if they do not exist
-		var newSkills []domain.Skill
-		for _, name := range uniqueNames {
-			lower := strings.ToLower(name)
-			if _, exists := existingMap[lower]; !exists {
-				newSkills = append(newSkills, domain.Skill{
-					Name:  name,
-					Label: name,
-				})
+		if len(newSkillNames) > 0 {
+			var newSkillsToInsert []domain.Skill
+			for _, name := range newSkillNames {
+				newSkillsToInsert = append(newSkillsToInsert, domain.Skill{Name: name, Label: ""})
 			}
-		}
 
-		if len(newSkills) > 0 {
-			if err := tx.Clauses(clause.OnConflict{
-				Columns:   []clause.Column{{Name: "name"}},
-				DoNothing: true,
-			}).Create(&newSkills).Error; err != nil {
+			if err := tx.Clauses(
+				clause.OnConflict{
+					Columns:   []clause.Column{{Name: "name"}},
+					DoNothing: true,
+				},
+			).Create(newSkillsToInsert).Error; err != nil {
 				return err
 			}
+
+			var resolvedNewSkills []domain.Skill
+			if err := tx.Where("name IN ?", newSkillNames).Find(&resolvedNewSkills).Error; err != nil {
+				return err
+			}
+
+			skillsWithId = append(skillsWithId, resolvedNewSkills...)
 		}
 
-		// Retrieve all matching skills
-		if err := tx.Where("LOWER(name) IN ?", lowerNames).Find(&finalSkills).Error; err != nil {
+		skillsId := make([]uuid.UUID, 0, len(skillsWithId))
+		for _, skill := range skillsWithId {
+			skillsId = append(skillsId, skill.ID)
+		}
+
+		if err := tx.Where("id IN ?", skillsId).Find(&finalSkills).Error; err != nil {
 			return err
 		}
 
-		// Replace candidate's skills association
 		if err := tx.Model(&profile).Association("Skills").Replace(finalSkills); err != nil {
 			return err
 		}
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
