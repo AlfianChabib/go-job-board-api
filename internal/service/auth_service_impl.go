@@ -105,7 +105,7 @@ func (service *authServiceImpl) RefreshToken(ctx context.Context, data web.Refre
 		return nil, fiber.NewError(fiber.StatusUnauthorized, err.Error())
 	}
 
-	userWithToken, err := service.AuthRepository.FindTokenWithUser(ctx, decodedToken.UserID, data.RefreshToken)
+	userWithToken, err := service.TokenRepository.FindTokenWithUser(ctx, decodedToken.UserID, data.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
