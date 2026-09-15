@@ -50,7 +50,7 @@ func (repo *authRepositoryImpl) FindByEmail(ctx context.Context, email string) (
 func (repo *authRepositoryImpl) FindTokenWithUser(ctx context.Context, userId uuid.UUID, refreshToken string) (*domain.Token, error) {
 	var token domain.Token
 	err := repo.db.WithContext(ctx).
-		Where("refresh_token = ? AND user_id = ? AND is_revoked = ?", refreshToken, userId, false).
+		Where("refresh_token = ? AND user_id = ?", refreshToken, userId).
 		Preload("User").
 		First(&token).Error
 	if err != nil {

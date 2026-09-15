@@ -9,14 +9,14 @@ import (
 )
 
 type Token struct {
-	ID           uuid.UUID `gorm:"column:id;type:uuid"`
-	UserId       uuid.UUID `gorm:"column:user_id;type:uuid"`
-	RefreshToken string    `gorm:"column:refresh_token;type:varchar;size:255"`
-	IsRevoked    bool      `gorm:"column:is_revoked;type:bool;default:false"`
-	ExpiresAt    time.Time `gorm:"column:expires_at"`
-	CreatedAt    time.Time `gorm:"column:created_at;autoCreateDate;<-:create"`
-	UpdatedAt    time.Time `gorm:"column:created_at;autoCreateDate;autoUpdateDate"`
-	User         User      `gorm:"foreignKey:UserId;references:ID"`
+	ID           uuid.UUID  `gorm:"column:id;type:uuid"`
+	UserId       uuid.UUID  `gorm:"column:user_id;type:uuid"`
+	RefreshToken string     `gorm:"column:refresh_token;type:varchar;size:255"`
+	RevokedAt    *time.Time `gorm:"column:revoked_at"`
+	ExpiresAt    time.Time  `gorm:"column:expires_at"`
+	CreatedAt    time.Time  `gorm:"column:created_at;autoCreateDate;<-:create"`
+	UpdatedAt    time.Time  `gorm:"column:created_at;autoCreateDate;autoUpdateDate"`
+	User         User       `gorm:"foreignKey:UserId;references:ID"`
 }
 
 func (t *Token) TableName() string {

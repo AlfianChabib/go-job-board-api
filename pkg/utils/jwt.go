@@ -38,6 +38,7 @@ func (j *jwtManager) GenerateTokenPair(userID uuid.UUID, role domain.UserRole) (
 		UserID: userID,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        uuid.New().String(),
 			ExpiresAt: jwt.NewNumericDate(accessExpiredAt),
 		},
 	}
@@ -46,6 +47,7 @@ func (j *jwtManager) GenerateTokenPair(userID uuid.UUID, role domain.UserRole) (
 	refreshClaims := &domain.JwtCustomClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        uuid.New().String(),
 			ExpiresAt: jwt.NewNumericDate(refreshExpiredAt),
 		},
 	}

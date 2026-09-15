@@ -1,11 +1,11 @@
 package service
 
 import (
-	"context"
-
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
 	"AlfianChabib/go-job-board-api/internal/repository"
+	"context"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -110,14 +110,23 @@ func (service *authServiceImpl) RefreshToken(ctx context.Context, data web.Refre
 		return nil, err
 	}
 
+	if userWithToken.RevokedAt != nil {
+		timeSinceRevoked := time.Since(*userWithToken.RevokedAt)
+		if timeSinceRevoked > (10 * time.Second) {
+			return nil, fiber.NewError(fiber.StatusUnauthorized, "Token sudah dicabut dan melewati batas waktu")
+		}
+	}
+
 	newTokens, err := service.JwtManager.GenerateTokenPair(userWithToken.User.ID, userWithToken.User.Role)
 	if err != nil {
 		return nil, err
 	}
 
-	err = service.TokenRepository.RevokeToken(ctx, data.RefreshToken)
-	if err != nil {
-		return nil, err
+	if userWithToken.RevokedAt == nil {
+		err = service.TokenRepository.RevokeToken(ctx, data.RefreshToken)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	_, err = service.TokenRepository.Save(ctx, domain.Token{

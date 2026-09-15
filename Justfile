@@ -34,6 +34,9 @@ database_port := env_var("DATABASE_PORT")
 DB_URL := "postgres://" + database_user + ":" + database_password + "@" + database_host + ":" + database_port + "/" + database_db + "?sslmode=disable"
 MIGRATIONS_DIR := "db/migrations"
 
+migrate-new migrate-name:
+  migrate create -ext sql -dir db/migrations {{migrate-name}}
+
 # Run pending migrations up: `just migrate-up` atau `just migrate-up 1`
 migrate-up steps="":
     migrate -database "{{DB_URL}}" -path {{MIGRATIONS_DIR}} up {{steps}}

@@ -4,6 +4,7 @@ import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -17,7 +18,7 @@ func NewTokenRepository(db *gorm.DB) TokenRepository {
 }
 
 func (repo *tokenRepositoryImpl) Save(ctx context.Context, token domain.Token) (*domain.Token, error) {
-	err := repo.db.Model(&token).Save(&token).Error
+	err := repo.db.WithContext(ctx).Model(&token).Save(&token).Error
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +27,10 @@ func (repo *tokenRepositoryImpl) Save(ctx context.Context, token domain.Token) (
 }
 
 func (repo *tokenRepositoryImpl) RevokeToken(ctx context.Context, refreshToken string) error {
-	result := repo.db.Model(&domain.Token{}).
-		Where("refresh_token = ? AND is_revoked = false", refreshToken).
-		Update("is_revoked", true)
+	now := time.Now()
+	result := repo.db.WithContext(ctx).Model(&domain.Token{}).
+		Where("refresh_token = ? AND revoked_at IS NULL", refreshToken).
+		Update("revoked_at", now)
 
 	if result.Error != nil {
 		return errors.New("Internal server error")
