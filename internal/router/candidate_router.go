@@ -21,4 +21,5 @@ func SetupCandidateRoutes(
 	candidate.Patch("/avatar", candidateController.UpdateAvatar)
 	candidate.Delete("/avatar", candidateController.DeleteAvatar)
 	candidate.Put("/skills", candidateController.UpdateSkills)
+	candidate.Get("/experiences", candidateController.GetExperiences)
 }

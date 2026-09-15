@@ -10,4 +10,5 @@ type CandidateController interface {
 	UpdateAvatar(c fiber.Ctx) error
 	DeleteAvatar(c fiber.Ctx) error
 	UpdateSkills(c fiber.Ctx) error
+	GetExperiences(c fiber.Ctx) error
 }

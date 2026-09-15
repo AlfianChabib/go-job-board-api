@@ -2,6 +2,7 @@ package controller
 
 import (
 	"AlfianChabib/go-job-board-api/internal/helper"
+	"AlfianChabib/go-job-board-api/internal/helper/request"
 	"AlfianChabib/go-job-board-api/internal/helper/response"
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
@@ -26,7 +27,10 @@ func NewCandidateController(candidateService service.CandidateService) Candidate
 
 func (controller *candidateController) Get(c fiber.Ctx) error {
 	ctx := c.Context()
-	userId := c.Locals("userId").(uuid.UUID)
+	userId, _, err := request.GetAuthLocals(c)
+	if err != nil {
+		return err
+	}
 
 	if userId == uuid.Nil {
 		return fiber.NewError(fiber.StatusNotFound, "User not found")
@@ -42,19 +46,18 @@ func (controller *candidateController) Get(c fiber.Ctx) error {
 
 func (controller *candidateController) Update(c fiber.Ctx) error {
 	ctx := c.Context()
-	var req web.UpdateCandidateRequest
-	userId := c.Locals("userId").(uuid.UUID)
-
-	if userId == uuid.Nil {
-		return fiber.NewError(fiber.StatusNotFound, "User not found")
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
 	}
 
+	var req web.UpdateCandidateRequest
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
 	candidate, err := controller.candidateService.Update(ctx, domain.Profile{
-		UserId:   userId,
+		UserId:   session.UserId,
 		Headline: &req.Headline,
 		Phone:    &req.Phone,
 	})
@@ -71,7 +74,10 @@ func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
 	allowedFileFormats := []string{".jpg", "jpeg", ".png"}
 
 	ctx := c.Context()
-	userId := c.Locals("userId").(uuid.UUID)
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
+	}
 
 	fileHeader, err := c.FormFile("avatar")
 	if err != nil {
@@ -105,7 +111,7 @@ func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
 	defer file.Close()
 
 	req := web.UpdateCandidateAvatarRequest{
-		UserId:     userId,
+		UserId:     session.UserId,
 		File:       file,
 		FileSize:   fileHeader.Size,
 		ContenType: fileContentType,
@@ -121,9 +127,12 @@ func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
 }
 
 func (controller *candidateController) DeleteAvatar(c fiber.Ctx) error {
-	userId := c.Locals("userId").(uuid.UUID)
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
+	}
 	ctx := c.Context()
-	err := controller.candidateService.DeleteAvatar(ctx, userId)
+	err = controller.candidateService.DeleteAvatar(ctx, session.UserId)
 	if err != nil {
 		return err
 	}
@@ -131,9 +140,9 @@ func (controller *candidateController) DeleteAvatar(c fiber.Ctx) error {
 }
 
 func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
-	userId, ok := c.Locals("userId").(uuid.UUID)
-	if !ok || userId == uuid.Nil {
-		return fiber.NewError(fiber.StatusNotFound, "User not found")
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
 	}
 
 	var req web.UpdateCandidateSkillsRequest
@@ -142,10 +151,24 @@ func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
 	}
 
 	ctx := c.Context()
-	skills, err := controller.candidateService.UpdateSkills(ctx, userId, req)
+	skills, err := controller.candidateService.UpdateSkills(ctx, session.UserId, req)
 	if err != nil {
 		return err
 	}
 
 	return response.OK(c, "Success update skills", skills)
+}
+
+func (controller *candidateController) GetExperiences(c fiber.Ctx) error {
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
+	}
+	ctx := c.Context()
+	experiences, err := controller.candidateService.GetExperiences(ctx, session.UserId)
+	if err != nil {
+		return err
+	}
+
+	return response.OK(c, "Success get experiences", experiences)
 }

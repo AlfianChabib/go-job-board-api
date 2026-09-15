@@ -108,3 +108,11 @@ func (service *candidateService) UpdateSkills(ctx context.Context, userId uuid.U
 
 	return updatedSkills, nil
 }
+
+func (service *candidateService) GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error) {
+	experiences, err := service.repository.GetExperiences(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return experiences, nil
+}

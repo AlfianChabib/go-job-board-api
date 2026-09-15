@@ -14,4 +14,5 @@ type CandidateRepository interface {
 	UploadAvatar(ctx context.Context, userId uuid.UUID, avatarUrl string) error
 	DeleteAvatar(ctx context.Context, userId uuid.UUID) error
 	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error)
+	GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error)
 }

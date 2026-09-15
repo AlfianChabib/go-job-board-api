@@ -144,3 +144,15 @@ func (repo *candidateRepository) UpdateSkills(ctx context.Context, userId uuid.U
 
 	return &finalSkills, nil
 }
+
+func (repo *candidateRepository) GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error) {
+	var candidate domain.Profile
+	err := repo.db.WithContext(ctx).
+		Preload("Experiences").
+		Take(&candidate, "user_id = ?", userId).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &candidate.Experiences, nil
+}
