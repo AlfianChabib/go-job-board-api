@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 )
 
@@ -181,7 +180,6 @@ func (ctrl *candidateController) CreateExperience(c fiber.Ctx) error {
 	}
 	var req web.CreateExperienceRequest
 	if err := c.Bind().Body(&req); err != nil {
-		log.Info(err)
 		return err
 	}
 
@@ -193,4 +191,23 @@ func (ctrl *candidateController) CreateExperience(c fiber.Ctx) error {
 	}
 
 	return response.Message(c, fiber.StatusOK, "Success create experience")
+}
+
+func (ctrl *candidateController) UpdateExperience(c fiber.Ctx) error {
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
+	}
+
+	var req web.UpdateExperienceRequest
+	if err := c.Bind().All(&req); err != nil {
+		return err
+	}
+
+	ctx := c.Context()
+	if err := ctrl.candidateService.UpdateExperience(ctx, session.UserId, req); err != nil {
+		return err
+	}
+
+	return response.Message(c, fiber.StatusOK, "Success update experience")
 }

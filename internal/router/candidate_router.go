@@ -18,9 +18,13 @@ func SetupCandidateRoutes(
 
 	candidate.Get("/", candidateController.Get)
 	candidate.Put("/", candidateController.Update)
+
 	candidate.Patch("/avatar", candidateController.UpdateAvatar)
 	candidate.Delete("/avatar", candidateController.DeleteAvatar)
+
 	candidate.Put("/skills", candidateController.UpdateSkills)
+
 	candidate.Get("/experiences", candidateController.GetExperiences)
 	candidate.Post("/experiences", candidateController.CreateExperience)
+	candidate.Put("/experiences/:experienceId", candidateController.UpdateExperience)
 }

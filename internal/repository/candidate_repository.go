@@ -16,4 +16,5 @@ type CandidateRepository interface {
 	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error)
 	GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error)
 	CreateExperience(ctx context.Context, userId uuid.UUID, experience domain.Experience) error
+	UpdateExperience(ctx context.Context, experienceId uuid.UUID, experience domain.Experience) error
 }

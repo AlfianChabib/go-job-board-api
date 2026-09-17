@@ -16,4 +16,5 @@ type CandidateService interface {
 	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error)
 	GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error)
 	CreateExperience(ctx context.Context, userId uuid.UUID, req web.CreateExperienceRequest) error
+	UpdateExperience(ctx context.Context, userId uuid.UUID, req web.UpdateExperienceRequest) error
 }

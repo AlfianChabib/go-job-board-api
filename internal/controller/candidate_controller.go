@@ -12,4 +12,5 @@ type CandidateController interface {
 	UpdateSkills(c fiber.Ctx) error
 	GetExperiences(c fiber.Ctx) error
 	CreateExperience(c fiber.Ctx) error
+	UpdateExperience(c fiber.Ctx) error
 }

@@ -145,3 +145,35 @@ func (service *candidateService) CreateExperience(ctx context.Context, userId uu
 
 	return nil
 }
+
+func (service *candidateService) UpdateExperience(ctx context.Context, userId uuid.UUID, req web.UpdateExperienceRequest) error {
+	profile, err := service.repository.Get(ctx, userId)
+	if err != nil {
+		return err
+	}
+
+	var isCurrent bool
+	if req.EndDate != nil {
+		isCurrent = true
+	}
+
+	startDate, err := time.Parse(time.RFC3339, req.StartDate)
+	endDate, err := time.Parse(time.RFC3339, *req.EndDate)
+
+	newExperience := domain.Experience{
+		ID:          req.ExperienceId,
+		ProfileId:   profile.ID,
+		CompanyName: req.CompanyName,
+		Position:    req.Position,
+		StartDate:   startDate,
+		EndDate:     &endDate,
+		IsCurrent:   isCurrent,
+		Description: req.Description,
+	}
+
+	if err = service.repository.UpdateExperience(ctx, newExperience.ID, newExperience); err != nil {
+		return err
+	}
+
+	return nil
+}

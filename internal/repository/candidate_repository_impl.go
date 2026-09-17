@@ -6,6 +6,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -160,6 +161,15 @@ func (repo *candidateRepository) GetExperiences(ctx context.Context, userId uuid
 func (repo *candidateRepository) CreateExperience(ctx context.Context, userId uuid.UUID, experience domain.Experience) error {
 	err := repo.db.WithContext(ctx).Create(&experience).Error
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *candidateRepository) UpdateExperience(ctx context.Context, experienceId uuid.UUID, experience domain.Experience) error {
+	if err := repo.db.WithContext(ctx).Model(&domain.Experience{}).Where("id = ?", experienceId).Updates(experience).Error; err != nil {
+		log.Info(err)
 		return err
 	}
 
