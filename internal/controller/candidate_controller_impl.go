@@ -211,3 +211,22 @@ func (ctrl *candidateController) UpdateExperience(c fiber.Ctx) error {
 
 	return response.Message(c, fiber.StatusOK, "Success update experience")
 }
+
+func (ctrl *candidateController) DeleteExperience(c fiber.Ctx) error {
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
+	}
+
+	var req web.DeleteExperienceRequest
+	if err := c.Bind().All(&req); err != nil {
+		return err
+	}
+
+	ctx := c.Context()
+	if err := ctrl.candidateService.DeleteExperience(ctx, session.UserId, req.ExperienceId); err != nil {
+		return err
+	}
+
+	return response.Message(c, fiber.StatusOK, "Success delete experience")
+}

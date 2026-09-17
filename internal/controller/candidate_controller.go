@@ -13,4 +13,5 @@ type CandidateController interface {
 	GetExperiences(c fiber.Ctx) error
 	CreateExperience(c fiber.Ctx) error
 	UpdateExperience(c fiber.Ctx) error
+	DeleteExperience(c fiber.Ctx) error
 }

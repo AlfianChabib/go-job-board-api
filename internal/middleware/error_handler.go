@@ -2,13 +2,17 @@ package middleware
 
 import (
 	"AlfianChabib/go-job-board-api/internal/helper/response"
+	"AlfianChabib/go-job-board-api/pkg/errs"
 	customValidator "AlfianChabib/go-job-board-api/pkg/validator"
+	"encoding/json"
 	"errors"
+	"log"
+	"net/http"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/log"
+	"gorm.io/gorm"
 )
 
 func ErrorHandler(c fiber.Ctx, err error) error {
@@ -43,18 +47,35 @@ func ErrorHandler(c fiber.Ctx, err error) error {
 
 func NewCustomErrorHandler(v customValidator.StructValidator) fiber.ErrorHandler {
 	return func(c fiber.Ctx, err error) error {
-		log.Error(err)
-		if valErrs, ok := errors.AsType[validator.ValidationErrors](err); ok {
+		code := fiber.StatusInternalServerError
+		var message string
+
+		if appErr, ok := errors.AsType[*errs.AppError](err); ok {
+			code = appErr.Code
+			message = appErr.Message
+
+		} else if fiberErr, ok := errors.AsType[*fiber.Error](err); ok {
+			code = fiberErr.Code
+			message = fiberErr.Message
+
+		} else if errors.Is(err, gorm.ErrRecordNotFound) {
+			code = http.StatusNotFound
+			message = "Data not found"
+
+		} else if valErrs, ok := errors.AsType[validator.ValidationErrors](err); ok {
 			formattedErrors := v.FormatValidationErrors(valErrs)
 			return response.ValidationError(c, "Validation failed", formattedErrors)
+
+		} else if jsonErr, ok := errors.AsType[*json.UnmarshalTypeError](err); ok {
+			code = http.StatusBadRequest
+			message = "Data type does not match the field: " + jsonErr.Field
+
+		} else {
+			log.Println(err)
+			message = "Internal server error"
+
 		}
 
-		// 2. Cek apakah error dari HTTP Fiber bawaan (misal 404, 405)
-		if fiberErr, ok := errors.AsType[*fiber.Error](err); ok {
-			return response.Error(c, fiberErr.Code, fiberErr.Message)
-		}
-
-		// 3. Fallback untuk internal server error (500)
-		return response.Error(c, fiber.StatusInternalServerError, "Internal server error")
+		return response.Error(c, code, message)
 	}
 }

@@ -42,11 +42,15 @@ type CreateExperienceRequest struct {
 }
 
 type UpdateExperienceRequest struct {
-	ExperienceId uuid.UUID `param:"id" validate:"required"`
+	ExperienceId uuid.UUID `param:"experienceId" validate:"required"`
 	CompanyName  string    `json:"company_name" validate:"required"`
 	Position     string    `json:"position" validate:"required"`
 	StartDate    string    `json:"start_date" validate:"required,rfc3339"`
 	EndDate      *string   `json:"end_date" validate:"required_if=IsCurrent false,rfc3339"`
 	IsCurrent    bool      `json:"is_current"`
 	Description  *string   `json:"description,omitempty"`
+}
+
+type DeleteExperienceRequest struct {
+	ExperienceId uuid.UUID `param:"experienceId" validate:"required"`
 }

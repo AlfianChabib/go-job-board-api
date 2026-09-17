@@ -27,4 +27,5 @@ func SetupCandidateRoutes(
 	candidate.Get("/experiences", candidateController.GetExperiences)
 	candidate.Post("/experiences", candidateController.CreateExperience)
 	candidate.Put("/experiences/:experienceId", candidateController.UpdateExperience)
+	candidate.Delete("/experiences/:experienceId", candidateController.DeleteExperience)
 }

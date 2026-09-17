@@ -97,7 +97,7 @@ func (service *candidateService) DeleteAvatar(ctx context.Context, userId uuid.U
 	return nil
 }
 
-func (service *candidateService) UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error) {
+func (service *candidateService) UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) ([]domain.Skill, error) {
 	updatedSkills, err := service.repository.UpdateSkills(ctx, userId, skills)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -109,7 +109,7 @@ func (service *candidateService) UpdateSkills(ctx context.Context, userId uuid.U
 	return updatedSkills, nil
 }
 
-func (service *candidateService) GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error) {
+func (service *candidateService) GetExperiences(ctx context.Context, userId uuid.UUID) ([]domain.Experience, error) {
 	experiences, err := service.repository.GetExperiences(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func (service *candidateService) CreateExperience(ctx context.Context, userId uu
 }
 
 func (service *candidateService) UpdateExperience(ctx context.Context, userId uuid.UUID, req web.UpdateExperienceRequest) error {
-	profile, err := service.repository.Get(ctx, userId)
+	profileId, err := service.repository.GetProfileIdByUserId(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (service *candidateService) UpdateExperience(ctx context.Context, userId uu
 
 	newExperience := domain.Experience{
 		ID:          req.ExperienceId,
-		ProfileId:   profile.ID,
+		ProfileId:   profileId,
 		CompanyName: req.CompanyName,
 		Position:    req.Position,
 		StartDate:   startDate,
@@ -171,9 +171,14 @@ func (service *candidateService) UpdateExperience(ctx context.Context, userId uu
 		Description: req.Description,
 	}
 
-	if err = service.repository.UpdateExperience(ctx, newExperience.ID, newExperience); err != nil {
+	return service.repository.UpdateExperience(ctx, newExperience.ID, newExperience)
+}
+
+func (service *candidateService) DeleteExperience(ctx context.Context, userId uuid.UUID, experienceId uuid.UUID) error {
+	profileId, err := service.repository.GetProfileIdByUserId(ctx, userId)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	return service.repository.DeleteExperience(ctx, profileId, experienceId)
 }

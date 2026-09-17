@@ -3,10 +3,10 @@ package repository
 import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
+	"AlfianChabib/go-job-board-api/pkg/errs"
 	"context"
 	"strings"
 
-	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -33,6 +33,20 @@ func (repo *candidateRepository) Get(ctx context.Context, userId uuid.UUID) (*do
 	}
 
 	return &candidate, nil
+}
+
+func (repo *candidateRepository) GetProfileIdByUserId(ctx context.Context, userId uuid.UUID) (uuid.UUID, error) {
+	var profile domain.Profile
+
+	err := repo.db.WithContext(ctx).
+		Select("id").
+		Where("user_id = ?", userId).
+		Take(&profile).Error
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return profile.ID, nil
 }
 
 func (repo *candidateRepository) Update(ctx context.Context, candidate domain.Profile) (*domain.Profile, error) {
@@ -72,7 +86,7 @@ func (repo *candidateRepository) DeleteAvatar(ctx context.Context, userId uuid.U
 	return nil
 }
 
-func (repo *candidateRepository) UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error) {
+func (repo *candidateRepository) UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) ([]domain.Skill, error) {
 	var finalSkills []domain.Skill
 	err := repo.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var profile domain.Profile
@@ -143,10 +157,10 @@ func (repo *candidateRepository) UpdateSkills(ctx context.Context, userId uuid.U
 		return nil, err
 	}
 
-	return &finalSkills, nil
+	return finalSkills, nil
 }
 
-func (repo *candidateRepository) GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error) {
+func (repo *candidateRepository) GetExperiences(ctx context.Context, userId uuid.UUID) ([]domain.Experience, error) {
 	var candidate domain.Profile
 	err := repo.db.WithContext(ctx).
 		Preload("Experiences").
@@ -155,7 +169,7 @@ func (repo *candidateRepository) GetExperiences(ctx context.Context, userId uuid
 		return nil, err
 	}
 
-	return &candidate.Experiences, nil
+	return candidate.Experiences, nil
 }
 
 func (repo *candidateRepository) CreateExperience(ctx context.Context, userId uuid.UUID, experience domain.Experience) error {
@@ -168,9 +182,34 @@ func (repo *candidateRepository) CreateExperience(ctx context.Context, userId uu
 }
 
 func (repo *candidateRepository) UpdateExperience(ctx context.Context, experienceId uuid.UUID, experience domain.Experience) error {
-	if err := repo.db.WithContext(ctx).Model(&domain.Experience{}).Where("id = ?", experienceId).Updates(experience).Error; err != nil {
-		log.Info(err)
-		return err
+	result := repo.db.WithContext(ctx).
+		Model(&domain.Experience{}).
+		Where("profile_id = ?", experience.ProfileId).
+		Where("id = ?", experienceId).
+		Updates(experience)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errs.ErrExperienceNotFound
+	}
+
+	return nil
+}
+
+func (repo *candidateRepository) DeleteExperience(ctx context.Context, profileId uuid.UUID, experienceId uuid.UUID) error {
+	result := repo.db.WithContext(ctx).
+		Where("id = ? AND profile_id = ?", experienceId, profileId).
+		Delete(&domain.Experience{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errs.ErrExperienceNotFound
 	}
 
 	return nil

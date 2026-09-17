@@ -13,8 +13,9 @@ type CandidateService interface {
 	Update(ctx context.Context, candidate domain.Profile) (*web.UpdateCandidateResponse, error)
 	UploadAvatar(ctx context.Context, req web.UpdateCandidateAvatarRequest) (*string, error)
 	DeleteAvatar(ctx context.Context, userId uuid.UUID) error
-	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error)
-	GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error)
+	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) ([]domain.Skill, error)
+	GetExperiences(ctx context.Context, userId uuid.UUID) ([]domain.Experience, error)
 	CreateExperience(ctx context.Context, userId uuid.UUID, req web.CreateExperienceRequest) error
 	UpdateExperience(ctx context.Context, userId uuid.UUID, req web.UpdateExperienceRequest) error
+	DeleteExperience(ctx context.Context, userId uuid.UUID, experienceId uuid.UUID) error
 }
