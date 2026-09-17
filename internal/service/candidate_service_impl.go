@@ -116,3 +116,32 @@ func (service *candidateService) GetExperiences(ctx context.Context, userId uuid
 	}
 	return experiences, nil
 }
+
+func (service *candidateService) CreateExperience(ctx context.Context, userId uuid.UUID, req web.CreateExperienceRequest) error {
+	profile, err := service.repository.Get(ctx, userId)
+
+	var isCurrent bool
+	if req.EndDate != nil {
+		isCurrent = true
+	}
+
+	startDate, err := time.Parse(time.RFC3339, req.StartDate)
+	endDate, err := time.Parse(time.RFC3339, *req.EndDate)
+
+	experience := domain.Experience{
+		ProfileId:   profile.ID,
+		CompanyName: req.CompanyName,
+		Position:    req.Position,
+		StartDate:   startDate,
+		EndDate:     &endDate,
+		IsCurrent:   isCurrent,
+		Description: req.Description,
+	}
+
+	err = service.repository.CreateExperience(ctx, userId, experience)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

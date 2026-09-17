@@ -15,4 +15,5 @@ type CandidateService interface {
 	DeleteAvatar(ctx context.Context, userId uuid.UUID) error
 	UpdateSkills(ctx context.Context, userId uuid.UUID, skills web.UpdateCandidateSkillsRequest) (*[]domain.Skill, error)
 	GetExperiences(ctx context.Context, userId uuid.UUID) (*[]domain.Experience, error)
+	CreateExperience(ctx context.Context, userId uuid.UUID, req web.CreateExperienceRequest) error
 }

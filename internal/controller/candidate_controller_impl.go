@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 )
 
@@ -25,7 +26,7 @@ func NewCandidateController(candidateService service.CandidateService) Candidate
 	}
 }
 
-func (controller *candidateController) Get(c fiber.Ctx) error {
+func (ctrl *candidateController) Get(c fiber.Ctx) error {
 	ctx := c.Context()
 	userId, _, err := request.GetAuthLocals(c)
 	if err != nil {
@@ -36,7 +37,7 @@ func (controller *candidateController) Get(c fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
-	candidate, err := controller.candidateService.Get(ctx, userId)
+	candidate, err := ctrl.candidateService.Get(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -44,7 +45,7 @@ func (controller *candidateController) Get(c fiber.Ctx) error {
 	return response.OK(c, "Success get candidate", candidate)
 }
 
-func (controller *candidateController) Update(c fiber.Ctx) error {
+func (ctrl *candidateController) Update(c fiber.Ctx) error {
 	ctx := c.Context()
 	session, err := request.GetLocalSession(c)
 	if err != nil {
@@ -56,7 +57,7 @@ func (controller *candidateController) Update(c fiber.Ctx) error {
 		return err
 	}
 
-	candidate, err := controller.candidateService.Update(ctx, domain.Profile{
+	candidate, err := ctrl.candidateService.Update(ctx, domain.Profile{
 		UserId:   session.UserId,
 		Headline: &req.Headline,
 		Phone:    &req.Phone,
@@ -68,7 +69,7 @@ func (controller *candidateController) Update(c fiber.Ctx) error {
 	return response.OK(c, "Update candidate profile success", candidate)
 }
 
-func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
+func (ctrl *candidateController) UpdateAvatar(c fiber.Ctx) error {
 	maxFileSize := 5 * 1024 * 1024
 	allowedFileContentTypes := []string{"image/jpg", "image/jpeg", "image/png"}
 	allowedFileFormats := []string{".jpg", "jpeg", ".png"}
@@ -118,7 +119,7 @@ func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
 		Extension:  fileExtension,
 	}
 
-	responseUrl, err := controller.candidateService.UploadAvatar(ctx, req)
+	responseUrl, err := ctrl.candidateService.UploadAvatar(ctx, req)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Internal server err")
 	}
@@ -126,20 +127,20 @@ func (controller *candidateController) UpdateAvatar(c fiber.Ctx) error {
 	return response.OK(c, "Success upload avatar", responseUrl)
 }
 
-func (controller *candidateController) DeleteAvatar(c fiber.Ctx) error {
+func (ctrl *candidateController) DeleteAvatar(c fiber.Ctx) error {
 	session, err := request.GetLocalSession(c)
 	if err != nil {
 		return err
 	}
 	ctx := c.Context()
-	err = controller.candidateService.DeleteAvatar(ctx, session.UserId)
+	err = ctrl.candidateService.DeleteAvatar(ctx, session.UserId)
 	if err != nil {
 		return err
 	}
 	return response.Message(c, fiber.StatusOK, "Success delete avatar")
 }
 
-func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
+func (ctrl *candidateController) UpdateSkills(c fiber.Ctx) error {
 	session, err := request.GetLocalSession(c)
 	if err != nil {
 		return err
@@ -151,7 +152,7 @@ func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
 	}
 
 	ctx := c.Context()
-	skills, err := controller.candidateService.UpdateSkills(ctx, session.UserId, req)
+	skills, err := ctrl.candidateService.UpdateSkills(ctx, session.UserId, req)
 	if err != nil {
 		return err
 	}
@@ -159,16 +160,37 @@ func (controller *candidateController) UpdateSkills(c fiber.Ctx) error {
 	return response.OK(c, "Success update skills", skills)
 }
 
-func (controller *candidateController) GetExperiences(c fiber.Ctx) error {
+func (ctrl *candidateController) GetExperiences(c fiber.Ctx) error {
 	session, err := request.GetLocalSession(c)
 	if err != nil {
 		return err
 	}
 	ctx := c.Context()
-	experiences, err := controller.candidateService.GetExperiences(ctx, session.UserId)
+	experiences, err := ctrl.candidateService.GetExperiences(ctx, session.UserId)
 	if err != nil {
 		return err
 	}
 
 	return response.OK(c, "Success get experiences", experiences)
+}
+
+func (ctrl *candidateController) CreateExperience(c fiber.Ctx) error {
+	session, err := request.GetLocalSession(c)
+	if err != nil {
+		return err
+	}
+	var req web.CreateExperienceRequest
+	if err := c.Bind().Body(&req); err != nil {
+		log.Info(err)
+		return err
+	}
+
+	ctx := c.Context()
+
+	err = ctrl.candidateService.CreateExperience(ctx, session.UserId, req)
+	if err != nil {
+		return err
+	}
+
+	return response.Message(c, fiber.StatusOK, "Success create experience")
 }

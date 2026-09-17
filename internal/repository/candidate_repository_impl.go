@@ -156,3 +156,12 @@ func (repo *candidateRepository) GetExperiences(ctx context.Context, userId uuid
 
 	return &candidate.Experiences, nil
 }
+
+func (repo *candidateRepository) CreateExperience(ctx context.Context, userId uuid.UUID, experience domain.Experience) error {
+	err := repo.db.WithContext(ctx).Create(&experience).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

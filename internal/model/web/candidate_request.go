@@ -31,3 +31,12 @@ type SkillRequest struct {
 	Id   *uuid.UUID `json:"id,omitempty"`
 	Name string     `json:"name" validate:"required"`
 }
+
+type CreateExperienceRequest struct {
+	CompanyName string  `json:"company_name" validate:"required"`
+	Position    string  `json:"position" validate:"required"`
+	StartDate   string  `json:"start_date" validate:"required,rfc3339"`
+	EndDate     *string `json:"end_date" validate:"required_if=IsCurrent false,rfc3339"`
+	IsCurrent   bool    `json:"is_current"`
+	Description *string `json:"description,omitempty"`
+}
