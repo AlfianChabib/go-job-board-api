@@ -56,3 +56,51 @@ func (repo *storageRepository) DeleteAvatar(ctx context.Context, fileName string
 	}
 	return nil
 }
+
+func (repo *storageRepository) UploadLogo(ctx context.Context, fileName string, file io.Reader, size int64, contentType string) (*string, error) {
+	putOpts := minio.PutObjectOptions{
+		ContentType: contentType,
+	}
+
+	uploadInfo, err := repo.store.PutObject(
+		ctx,
+		repo.avatarBucket,
+		fileName,
+		file,
+		size,
+		putOpts,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("logo uploaded successfully: ETag: %s, Size: %d", uploadInfo.ETag, uploadInfo.Size)
+
+	url := fmt.Sprintf("%s/%s/%s", repo.minioPublicUrl, repo.avatarBucket, fileName)
+
+	return &url, nil
+}
+
+func (repo *storageRepository) UploadBanner(ctx context.Context, fileName string, file io.Reader, size int64, contentType string) (*string, error) {
+	putOpts := minio.PutObjectOptions{
+		ContentType: contentType,
+	}
+
+	uploadInfo, err := repo.store.PutObject(
+		ctx,
+		repo.avatarBucket,
+		fileName,
+		file,
+		size,
+		putOpts,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("banner uploaded successfully: ETag: %s, Size: %d", uploadInfo.ETag, uploadInfo.Size)
+
+	url := fmt.Sprintf("%s/%s/%s", repo.minioPublicUrl, repo.avatarBucket, fileName)
+
+	return &url, nil
+}

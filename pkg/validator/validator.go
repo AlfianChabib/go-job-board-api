@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -38,6 +39,11 @@ func NewValidator() StructValidator {
 	})
 
 	err := validate.RegisterValidation("rfc3339", ValidateRFC3339)
+	if err != nil {
+		panic(err)
+	}
+
+	err = validate.RegisterValidation("nullable_url", ValidateNullableURL)
 	if err != nil {
 		panic(err)
 	}
@@ -81,4 +87,19 @@ func ValidateRFC3339(fl validator.FieldLevel) bool {
 
 	// If err is nil (success), return true. If it fails, return false.
 	return err == nil
+}
+
+func ValidateNullableURL(fl validator.FieldLevel) bool {
+	val := fl.Field().String()
+
+	// Jika isinya string kosong "", biarkan lolos
+	if val == "" {
+		return true
+	}
+
+	// Jika ada isinya, pastikan itu adalah URL yang valid
+	u, err := url.ParseRequestURI(val)
+
+	// Pastikan tidak error, memiliki skema (http/https), dan ada host-nya
+	return err == nil && u.Scheme != "" && u.Host != ""
 }

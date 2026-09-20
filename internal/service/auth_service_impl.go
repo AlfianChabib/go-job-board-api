@@ -4,10 +4,10 @@ import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
 	"AlfianChabib/go-job-board-api/internal/model/web"
 	"AlfianChabib/go-job-board-api/internal/repository"
+	"AlfianChabib/go-job-board-api/pkg/errs"
 	"context"
+	"net/http"
 	"time"
-
-	"github.com/gofiber/fiber/v3"
 )
 
 type authServiceImpl struct {
@@ -34,16 +34,17 @@ func NewAuthService(
 func (service *authServiceImpl) Register(ctx context.Context, data web.RegisterRequest) (*web.RegisterResponse, error) {
 	newHash, err := service.PasswordHasher.Hash([]byte(data.Password))
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		return nil, errs.ErrInternalServer
 	}
 
 	if service.AuthRepository.IsUserExist(ctx, data.Email) {
-		return nil, fiber.NewError(fiber.StatusConflict, "User already exist")
+		return nil, errs.ErrUserAlreadyExists
 	}
 
 	user, err := service.AuthRepository.Register(ctx, domain.User{
 		Name:  data.Name,
 		Email: data.Email,
+		Role:  data.Role,
 		Auth: domain.Auth{
 			Email:    data.Email,
 			Password: newHash,
@@ -65,17 +66,17 @@ func (service *authServiceImpl) Register(ctx context.Context, data web.RegisterR
 func (service *authServiceImpl) Login(ctx context.Context, data web.LoginRequest) (*domain.TokenPair, error) {
 	user, err := service.AuthRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Wrong Password or Email")
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	matchedPassword := service.PasswordHasher.Compare([]byte(user.Auth.Password), []byte(data.Password))
 	if !matchedPassword {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Wrong Password or Email")
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	tokens, err := service.JwtManager.GenerateTokenPair(user.ID, user.Role)
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal server error")
+		return nil, errs.ErrInternalServer
 	}
 
 	_, err = service.TokenRepository.Save(ctx, domain.Token{
@@ -84,7 +85,7 @@ func (service *authServiceImpl) Login(ctx context.Context, data web.LoginRequest
 		ExpiresAt:    tokens.RefreshExpiredAt,
 	})
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal server error")
+		return nil, errs.ErrInternalServer
 	}
 
 	return tokens, nil
@@ -102,7 +103,7 @@ func (service *authServiceImpl) Logout(ctx context.Context, refreshToken string)
 func (service *authServiceImpl) RefreshToken(ctx context.Context, data web.RefreshTokenRequest) (*web.RefreshTokenResponse, error) {
 	decodedToken, err := service.JwtManager.ValidateRefreshToken(data.RefreshToken)
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, err.Error())
+		return nil, errs.New(http.StatusUnauthorized, err.Error())
 	}
 
 	userWithToken, err := service.TokenRepository.FindTokenWithUser(ctx, decodedToken.UserID, data.RefreshToken)
@@ -113,7 +114,7 @@ func (service *authServiceImpl) RefreshToken(ctx context.Context, data web.Refre
 	if userWithToken.RevokedAt != nil {
 		timeSinceRevoked := time.Since(*userWithToken.RevokedAt)
 		if timeSinceRevoked > (10 * time.Second) {
-			return nil, fiber.NewError(fiber.StatusUnauthorized, "Token sudah dicabut dan melewati batas waktu")
+			return nil, errs.ErrTokenRevoked
 		}
 	}
 

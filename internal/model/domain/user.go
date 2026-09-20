@@ -24,6 +24,7 @@ type User struct {
 	Auth      Auth      `gorm:"foreignKey:UserId;references:ID"`
 	Tokens    []Token   `gorm:"foreignKey:UserId;references:ID"`
 	Profile   *Profile  `gorm:"foreignKey:UserId;references:ID"`
+	Company   *Company  `gorm:"foreignKey:RecruiterId;references:ID"`
 }
 
 func (u *User) TableName() string {

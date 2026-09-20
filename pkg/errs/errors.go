@@ -29,6 +29,8 @@ var (
 	ErrTokenExpired       = &AppError{Code: http.StatusUnauthorized, Message: "Access token has expired."}
 	ErrTokenRevoked       = &AppError{Code: http.StatusUnauthorized, Message: "Session has been revoked."}
 	ErrForbidden          = &AppError{Code: http.StatusForbidden, Message: "You do not have permission to perform this action."}
+	ErrUserAlreadyExists  = &AppError{Code: http.StatusConflict, Message: "User already exists."}
+	ErrInvalidToken       = &AppError{Code: http.StatusUnauthorized, Message: "Invalid or expired token."}
 
 	// ==========================================
 	// 2. CLIENT REQUEST & VALIDATION (400, 422)
@@ -61,4 +63,18 @@ var (
 	// 6. Candidate
 	// ==========================================
 	ErrExperienceNotFound = &AppError{Code: http.StatusNotFound, Message: "Experience not found"}
+
+	// ==========================================
+	// 7. Server & Storage (500)
+	// ==========================================
+	ErrInternalServer     = &AppError{Code: http.StatusInternalServerError, Message: "Internal server error."}
+	ErrStorageUnavailable = &AppError{Code: http.StatusInternalServerError, Message: "Storage service not available."}
+
+	// ==========================================
+	// 8. Company / Recruiter (404, 409, 500)
+	// ==========================================
+	ErrCompanyNotFound      = &AppError{Code: http.StatusNotFound, Message: "Company not found"}
+	ErrCompanyAlreadyExists = &AppError{Code: http.StatusConflict, Message: "Recruiter already has a registered company"}
+	ErrUploadLogoFailed     = &AppError{Code: http.StatusInternalServerError, Message: "Failed to upload logo"}
+	ErrUploadBannerFailed   = &AppError{Code: http.StatusInternalServerError, Message: "Failed to upload banner"}
 )

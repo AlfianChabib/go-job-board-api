@@ -39,7 +39,10 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	storageRepository := ProvideStoragerepository(client, env)
 	candidateService := service.NewCandidateService(candidateRepository, storageRepository)
 	candidateController := ProvideCandidateController(candidateService)
-	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController)
+	recruiterRepository := repository.NewRecruiterRepository(db)
+	recruiterService := service.NewRecruiterService(recruiterRepository, storageRepository)
+	recruiterController := ProvideRecruiterController(recruiterService)
+	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController)
 	return app, nil
 }
 
@@ -66,6 +69,10 @@ func ProvideCandidateController(candidateService service.CandidateService) contr
 	return controller.NewCandidateController(candidateService)
 }
 
+func ProvideRecruiterController(recruiterService service.RecruiterService) controller.RecruiterController {
+	return controller.NewRecruiterController(recruiterService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -73,3 +80,5 @@ func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.S
 var authSet = wire.NewSet(repository.NewAuthRepository, repository.NewTokenRepository, service.NewAuthService, ProvideAuthController)
 
 var candidateSet = wire.NewSet(repository.NewCandidateRepository, ProvideStoragerepository, service.NewCandidateService, ProvideCandidateController)
+
+var recruiterSet = wire.NewSet(repository.NewRecruiterRepository, service.NewRecruiterService, ProvideRecruiterController)

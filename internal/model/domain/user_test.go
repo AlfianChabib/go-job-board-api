@@ -18,4 +18,14 @@ func TestUserSchema(t *testing.T) {
 	if !exists || rel == nil {
 		t.Errorf("Expected Auth relationship on User struct")
 	}
+
+	rel, exists = s.Relationships.Relations["Profile"]
+	if !exists || rel == nil {
+		t.Errorf("Expected Profile relationship on User struct")
+	}
+
+	rel, exists = s.Relationships.Relations["Company"]
+	if !exists || rel == nil {
+		t.Errorf("Expected Company relationship on User struct")
+	}
 }
