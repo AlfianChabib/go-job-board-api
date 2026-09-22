@@ -46,6 +46,10 @@ func ProvideRecruiterController(recruiterService service.RecruiterService) contr
 	return controller.NewRecruiterController(recruiterService)
 }
 
+func ProvideCompanyController(companyService service.CompanyService) controller.CompanyController {
+	return controller.NewCompanyController(companyService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -65,9 +69,14 @@ var candidateSet = wire.NewSet(
 )
 
 var recruiterSet = wire.NewSet(
-	repository.NewRecruiterRepository,
 	service.NewRecruiterService,
 	ProvideRecruiterController,
+)
+
+var companySet = wire.NewSet(
+	repository.NewCompanyRepository,
+	service.NewCompanyService,
+	ProvideCompanyController,
 )
 
 func InitializeApp(env *config.Env) (*fiber.App, error) {
@@ -81,6 +90,7 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 		authSet,
 		candidateSet,
 		recruiterSet,
+		companySet,
 		NewApp,
 	)
 	return nil, nil

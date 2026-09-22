@@ -39,10 +39,12 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	storageRepository := ProvideStoragerepository(client, env)
 	candidateService := service.NewCandidateService(candidateRepository, storageRepository)
 	candidateController := ProvideCandidateController(candidateService)
-	recruiterRepository := repository.NewRecruiterRepository(db)
-	recruiterService := service.NewRecruiterService(recruiterRepository, storageRepository)
+	companyRepository := repository.NewCompanyRepository(db)
+	recruiterService := service.NewRecruiterService(companyRepository, storageRepository)
 	recruiterController := ProvideRecruiterController(recruiterService)
-	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController)
+	companyService := service.NewCompanyService(companyRepository)
+	companyController := ProvideCompanyController(companyService)
+	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController, companyController)
 	return app, nil
 }
 
@@ -73,6 +75,10 @@ func ProvideRecruiterController(recruiterService service.RecruiterService) contr
 	return controller.NewRecruiterController(recruiterService)
 }
 
+func ProvideCompanyController(companyService service.CompanyService) controller.CompanyController {
+	return controller.NewCompanyController(companyService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -81,4 +87,6 @@ var authSet = wire.NewSet(repository.NewAuthRepository, repository.NewTokenRepos
 
 var candidateSet = wire.NewSet(repository.NewCandidateRepository, ProvideStoragerepository, service.NewCandidateService, ProvideCandidateController)
 
-var recruiterSet = wire.NewSet(repository.NewRecruiterRepository, service.NewRecruiterService, ProvideRecruiterController)
+var recruiterSet = wire.NewSet(service.NewRecruiterService, ProvideRecruiterController)
+
+var companySet = wire.NewSet(repository.NewCompanyRepository, service.NewCompanyService, ProvideCompanyController)

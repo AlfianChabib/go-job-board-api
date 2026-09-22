@@ -15,32 +15,32 @@ import (
 )
 
 type recruiterService struct {
-	repository  repository.RecruiterRepository
+	companyRepo repository.CompanyRepository
 	storageRepo repository.StorageRepository
 }
 
-func NewRecruiterService(repo repository.RecruiterRepository, storageRepo repository.StorageRepository) RecruiterService {
+func NewRecruiterService(companyRepo repository.CompanyRepository, storageRepo repository.StorageRepository) RecruiterService {
 	return &recruiterService{
-		repository:  repo,
+		companyRepo: companyRepo,
 		storageRepo: storageRepo,
 	}
 }
 
 // NewRecruiteService provides backwards compatibility for the initial constructor name
-func NewRecruiteService(repo repository.RecruiterRepository, storageRepo ...repository.StorageRepository) RecruiterService {
+func NewRecruiteService(companyRepo repository.CompanyRepository, storageRepo ...repository.StorageRepository) RecruiterService {
 	var storage repository.StorageRepository
 	if len(storageRepo) > 0 {
 		storage = storageRepo[0]
 	}
 	return &recruiterService{
-		repository:  repo,
+		companyRepo: companyRepo,
 		storageRepo: storage,
 	}
 }
 
 func (service *recruiterService) CreateCompany(ctx context.Context, recruiterId uuid.UUID, req web.CreateCompanyRequest) (*web.CompanyResponse, error) {
 	// Check if recruiter already has a company profile
-	existingCompany, err := service.repository.FindByRecruiterId(ctx, recruiterId)
+	existingCompany, err := service.companyRepo.FindByRecruiterId(ctx, recruiterId)
 	if err == nil && existingCompany != nil {
 		return nil, errs.ErrCompanyAlreadyExists
 	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -57,7 +57,7 @@ func (service *recruiterService) CreateCompany(ctx context.Context, recruiterId 
 		Website:      req.Website,
 	}
 
-	created, err := service.repository.Create(ctx, company)
+	created, err := service.companyRepo.Create(ctx, company)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (service *recruiterService) CreateCompany(ctx context.Context, recruiterId 
 }
 
 func (service *recruiterService) GetCompany(ctx context.Context, recruiterId uuid.UUID) (*web.CompanyResponse, error) {
-	company, err := service.repository.FindByRecruiterId(ctx, recruiterId)
+	company, err := service.companyRepo.FindByRecruiterId(ctx, recruiterId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errs.ErrCompanyNotFound
@@ -88,7 +88,7 @@ func (service *recruiterService) UpdateCompany(ctx context.Context, recruiterId 
 		Website:      req.Website,
 	}
 
-	updated, err := service.repository.Update(ctx, company)
+	updated, err := service.companyRepo.Update(ctx, company)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errs.ErrCompanyNotFound
@@ -101,7 +101,7 @@ func (service *recruiterService) UpdateCompany(ctx context.Context, recruiterId 
 
 func (service *recruiterService) UploadLogo(ctx context.Context, req web.UpdateCompanyLogoRequest) (*web.UploadCompanyLogoResponse, error) {
 	// Verify company exists
-	_, err := service.repository.FindByRecruiterId(ctx, req.RecruiterId)
+	_, err := service.companyRepo.FindByRecruiterId(ctx, req.RecruiterId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errs.ErrCompanyNotFound
@@ -119,7 +119,7 @@ func (service *recruiterService) UploadLogo(ctx context.Context, req web.UpdateC
 		return nil, errs.ErrUploadLogoFailed
 	}
 
-	err = service.repository.UpdateLogo(ctx, req.RecruiterId, *logoUrl)
+	err = service.companyRepo.UpdateLogo(ctx, req.RecruiterId, *logoUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (service *recruiterService) UploadLogo(ctx context.Context, req web.UpdateC
 
 func (service *recruiterService) UploadBanner(ctx context.Context, req web.UpdateCompanyBannerRequest) (*web.UploadCompanyBannerResponse, error) {
 	// Verify company exists
-	_, err := service.repository.FindByRecruiterId(ctx, req.RecruiterId)
+	_, err := service.companyRepo.FindByRecruiterId(ctx, req.RecruiterId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errs.ErrCompanyNotFound
@@ -149,7 +149,7 @@ func (service *recruiterService) UploadBanner(ctx context.Context, req web.Updat
 		return nil, errs.ErrUploadBannerFailed
 	}
 
-	err = service.repository.UpdateBanner(ctx, req.RecruiterId, *bannerUrl)
+	err = service.companyRepo.UpdateBanner(ctx, req.RecruiterId, *bannerUrl)
 	if err != nil {
 		return nil, err
 	}

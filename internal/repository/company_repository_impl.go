@@ -10,24 +10,24 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type recruiterRepositoryImpl struct {
+type companyRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewRecruiterRepository(db *gorm.DB) RecruiterRepository {
-	return &recruiterRepositoryImpl{
+func NewCompanyRepository(db *gorm.DB) CompanyRepository {
+	return &companyRepositoryImpl{
 		db: db,
 	}
 }
 
-func (repo *recruiterRepositoryImpl) Create(ctx context.Context, company domain.Company) (*domain.Company, error) {
+func (repo *companyRepositoryImpl) Create(ctx context.Context, company domain.Company) (*domain.Company, error) {
 	if err := repo.db.WithContext(ctx).Create(&company).Error; err != nil {
 		return nil, err
 	}
 	return &company, nil
 }
 
-func (repo *recruiterRepositoryImpl) FindByRecruiterId(ctx context.Context, recruiterId uuid.UUID) (*domain.Company, error) {
+func (repo *companyRepositoryImpl) FindByRecruiterId(ctx context.Context, recruiterId uuid.UUID) (*domain.Company, error) {
 	var company domain.Company
 	if err := repo.db.WithContext(ctx).
 		Where("recruiter_id = ?", recruiterId).
@@ -37,7 +37,7 @@ func (repo *recruiterRepositoryImpl) FindByRecruiterId(ctx context.Context, recr
 	return &company, nil
 }
 
-func (repo *recruiterRepositoryImpl) GetCompanyIdByRecruiterId(ctx context.Context, recruiterId uuid.UUID) (uuid.UUID, error) {
+func (repo *companyRepositoryImpl) GetCompanyIdByRecruiterId(ctx context.Context, recruiterId uuid.UUID) (uuid.UUID, error) {
 	var company domain.Company
 	if err := repo.db.WithContext(ctx).
 		Select("id").
@@ -48,7 +48,7 @@ func (repo *recruiterRepositoryImpl) GetCompanyIdByRecruiterId(ctx context.Conte
 	return company.ID, nil
 }
 
-func (repo *recruiterRepositoryImpl) FindById(ctx context.Context, id uuid.UUID) (*domain.Company, error) {
+func (repo *companyRepositoryImpl) FindById(ctx context.Context, id uuid.UUID) (*domain.Company, error) {
 	var company domain.Company
 	if err := repo.db.WithContext(ctx).
 		Where("id = ?", id).
@@ -58,7 +58,7 @@ func (repo *recruiterRepositoryImpl) FindById(ctx context.Context, id uuid.UUID)
 	return &company, nil
 }
 
-func (repo *recruiterRepositoryImpl) FindAll(ctx context.Context, req web.GetCompaniesRequest) ([]domain.Company, int64, error) {
+func (repo *companyRepositoryImpl) FindAll(ctx context.Context, req web.GetCompaniesRequest) ([]domain.Company, int64, error) {
 	var companies []domain.Company
 	var total int64
 
@@ -99,7 +99,7 @@ func (repo *recruiterRepositoryImpl) FindAll(ctx context.Context, req web.GetCom
 	return companies, total, nil
 }
 
-func (repo *recruiterRepositoryImpl) Update(ctx context.Context, company domain.Company) (*domain.Company, error) {
+func (repo *companyRepositoryImpl) Update(ctx context.Context, company domain.Company) (*domain.Company, error) {
 	query := repo.db.WithContext(ctx).
 		Model(&company).
 		Clauses(clause.Returning{})
@@ -122,7 +122,7 @@ func (repo *recruiterRepositoryImpl) Update(ctx context.Context, company domain.
 	return &company, nil
 }
 
-func (repo *recruiterRepositoryImpl) UpdateLogo(ctx context.Context, recruiterId uuid.UUID, logoUrl string) error {
+func (repo *companyRepositoryImpl) UpdateLogo(ctx context.Context, recruiterId uuid.UUID, logoUrl string) error {
 	result := repo.db.WithContext(ctx).
 		Model(&domain.Company{}).
 		Where("recruiter_id = ?", recruiterId).
@@ -137,7 +137,7 @@ func (repo *recruiterRepositoryImpl) UpdateLogo(ctx context.Context, recruiterId
 	return nil
 }
 
-func (repo *recruiterRepositoryImpl) UpdateBanner(ctx context.Context, recruiterId uuid.UUID, bannerUrl string) error {
+func (repo *companyRepositoryImpl) UpdateBanner(ctx context.Context, recruiterId uuid.UUID, bannerUrl string) error {
 	result := repo.db.WithContext(ctx).
 		Model(&domain.Company{}).
 		Where("recruiter_id = ?", recruiterId).

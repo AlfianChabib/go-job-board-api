@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type RecruiterRepository interface {
+type CompanyRepository interface {
 	Create(ctx context.Context, company domain.Company) (*domain.Company, error)
 	FindByRecruiterId(ctx context.Context, recruiterId uuid.UUID) (*domain.Company, error)
 	GetCompanyIdByRecruiterId(ctx context.Context, recruiterId uuid.UUID) (uuid.UUID, error)
