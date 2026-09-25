@@ -50,6 +50,10 @@ func ProvideCompanyController(companyService service.CompanyService) controller.
 	return controller.NewCompanyController(companyService)
 }
 
+func ProvideDataController(dataService service.DataService) controller.DataController {
+	return controller.NewDataController(dataService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -79,6 +83,12 @@ var companySet = wire.NewSet(
 	ProvideCompanyController,
 )
 
+var dataSet = wire.NewSet(
+	repository.NewSkillRepository,
+	service.NewDataService,
+	ProvideDataController,
+)
+
 func InitializeApp(env *config.Env) (*fiber.App, error) {
 	wire.Build(
 		database.OpenConnection,
@@ -91,6 +101,7 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 		candidateSet,
 		recruiterSet,
 		companySet,
+		dataSet,
 		NewApp,
 	)
 	return nil, nil

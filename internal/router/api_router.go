@@ -17,12 +17,14 @@ func InitializeRoutes(
 	candidateController controller.CandidateController,
 	recruiterController controller.RecruiterController,
 	companyController controller.CompanyController,
+	dataController controller.DataController,
 ) {
 	router.Get("/", func(c fiber.Ctx) error {
 		return response.Message(c, fiber.StatusOK, "Hello world!")
 	})
 
 	api := router.Group("/api")
+	SetupDataRoutes(api, dataController)
 	SetupAuthRoutes(api, authController)
 	SetupCandidateRoutes(api, middleware, candidateController)
 	SetupRecruiterRoutes(api, middleware, recruiterController)

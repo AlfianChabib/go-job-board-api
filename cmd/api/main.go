@@ -23,6 +23,7 @@ func NewApp(
 	candidateController controller.CandidateController,
 	recruiterController controller.RecruiterController,
 	companyController controller.CompanyController,
+	dataController controller.DataController,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 		StructValidator: validate,
@@ -40,7 +41,16 @@ func NewApp(
 		AllowOrigins: []string{"*"},
 	}))
 
-	router.InitializeRoutes(app, env, mw, authController, candidateController, recruiterController, companyController)
+	router.InitializeRoutes(
+		app,
+		env,
+		mw,
+		authController,
+		candidateController,
+		recruiterController,
+		companyController,
+		dataController,
+	)
 
 	return app
 }

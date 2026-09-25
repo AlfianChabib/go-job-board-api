@@ -1,5 +1,6 @@
 set dotenv-load
 set dotenv-filename := ".env"
+# set shell := if os() == "windows" { ["powershell.exe", "-NoProfile", "-Command"] } else { ["sh", "-c"] }
 
 # Jalankan development mode (Docker Compose + Air hot-reload secara paralel)
 [parallel]

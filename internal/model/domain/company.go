@@ -30,6 +30,7 @@ type Company struct {
 	CreatedAt    time.Time    `gorm:"column:created_at;autoCreateDate;<-:create"`
 	UpdatedAt    time.Time    `gorm:"column:updated_at;autoCreateDate;autoUpdateDate"`
 	Recruiter    *User        `gorm:"foreignKey:RecruiterId;references:ID"`
+	Jobs         []Job        `gorm:"foreignKey:CompanyId;references:ID"`
 }
 
 func (c *Company) TableName() string {

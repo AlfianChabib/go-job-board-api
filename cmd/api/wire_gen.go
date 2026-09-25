@@ -44,7 +44,10 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	recruiterController := ProvideRecruiterController(recruiterService)
 	companyService := service.NewCompanyService(companyRepository)
 	companyController := ProvideCompanyController(companyService)
-	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController, companyController)
+	skillRepository := repository.NewSkillRepository(db)
+	dataService := service.NewDataService(skillRepository)
+	dataController := ProvideDataController(dataService)
+	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController, companyController, dataController)
 	return app, nil
 }
 
@@ -79,6 +82,10 @@ func ProvideCompanyController(companyService service.CompanyService) controller.
 	return controller.NewCompanyController(companyService)
 }
 
+func ProvideDataController(dataService service.DataService) controller.DataController {
+	return controller.NewDataController(dataService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -90,3 +97,5 @@ var candidateSet = wire.NewSet(repository.NewCandidateRepository, ProvideStorage
 var recruiterSet = wire.NewSet(service.NewRecruiterService, ProvideRecruiterController)
 
 var companySet = wire.NewSet(repository.NewCompanyRepository, service.NewCompanyService, ProvideCompanyController)
+
+var dataSet = wire.NewSet(repository.NewSkillRepository, service.NewDataService, ProvideDataController)
