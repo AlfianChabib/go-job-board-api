@@ -3,9 +3,10 @@ package web
 import "github.com/google/uuid"
 
 type SkillResponse struct {
-	ID    uuid.UUID `json:"id"`
-	Name  string    `json:"name"`
-	Label string    `json:"label"`
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Label        string    `json:"label"`
+	Abbreviation string    `json:"abbreviation,omitempty"`
 }
 
 type CurrencyResponse struct {

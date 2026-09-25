@@ -2,6 +2,7 @@ package repository
 
 import (
 	"AlfianChabib/go-job-board-api/internal/model/domain"
+	"AlfianChabib/go-job-board-api/internal/model/web"
 	"context"
 
 	"gorm.io/gorm"
@@ -17,9 +18,21 @@ func NewSkillRepository(db *gorm.DB) SkillRepository {
 	}
 }
 
-func (r *skillRepositoryImpl) FindAll(ctx context.Context) ([]domain.Skill, error) {
+func (r *skillRepositoryImpl) FindAll(ctx context.Context, req web.GetDataRequest) ([]domain.Skill, error) {
 	var skills []domain.Skill
-	if err := r.db.WithContext(ctx).Order("name ASC").Find(&skills).Error; err != nil {
+	limit := req.Limit
+	if limit <= 0 {
+		limit = 10
+	}
+
+	query := r.db.WithContext(ctx).Model(&domain.Skill{})
+
+	if req.Search != "" {
+		searchTerm := "%" + req.Search + "%"
+		query = query.Where("name ILIKE ? OR label ILIKE ? OR abbreviation ILIKE ?", searchTerm, searchTerm, searchTerm)
+	}
+
+	if err := query.Order("name ASC").Limit(limit).Find(&skills).Error; err != nil {
 		return nil, err
 	}
 	return skills, nil

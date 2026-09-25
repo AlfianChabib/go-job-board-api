@@ -76,8 +76,8 @@ func (service *dataService) loadCurrencies() {
 	})
 }
 
-func (service *dataService) GetSkills(ctx context.Context) ([]web.SkillResponse, error) {
-	skills, err := service.skillRepository.FindAll(ctx)
+func (service *dataService) GetSkills(ctx context.Context, req web.GetDataRequest) ([]web.SkillResponse, error) {
+	skills, err := service.skillRepository.FindAll(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -85,15 +85,45 @@ func (service *dataService) GetSkills(ctx context.Context) ([]web.SkillResponse,
 	skillResponses := make([]web.SkillResponse, 0, len(skills))
 	for _, s := range skills {
 		skillResponses = append(skillResponses, web.SkillResponse{
-			ID:    s.ID,
-			Name:  s.Name,
-			Label: s.Label,
+			ID:           s.ID,
+			Name:         s.Name,
+			Label:        s.Label,
+			Abbreviation: s.Abbreviation,
 		})
 	}
 
 	return skillResponses, nil
 }
 
-func (service *dataService) GetCurrencyCodes(ctx context.Context) ([]web.CurrencyResponse, error) {
-	return service.currencyCache, nil
+func (service *dataService) GetCurrencyCodes(ctx context.Context, req web.GetDataRequest) ([]web.CurrencyResponse, error) {
+	limit := req.Limit
+	if limit <= 0 {
+		limit = 10
+	}
+
+	searchLower := strings.ToLower(strings.TrimSpace(req.Search))
+	var result []web.CurrencyResponse
+
+	for _, item := range service.currencyCache {
+		if searchLower != "" {
+			matchCode := strings.Contains(strings.ToLower(item.AlphabeticCode), searchLower)
+			matchCurrency := strings.Contains(strings.ToLower(item.Currency), searchLower)
+			matchEntity := strings.Contains(strings.ToLower(item.Entity), searchLower)
+
+			if !matchCode && !matchCurrency && !matchEntity {
+				continue
+			}
+		}
+
+		result = append(result, item)
+		if len(result) >= limit {
+			break
+		}
+	}
+
+	if result == nil {
+		result = []web.CurrencyResponse{}
+	}
+
+	return result, nil
 }

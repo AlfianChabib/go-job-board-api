@@ -2,6 +2,7 @@ package controller
 
 import (
 	"AlfianChabib/go-job-board-api/internal/helper/response"
+	"AlfianChabib/go-job-board-api/internal/model/web"
 	"AlfianChabib/go-job-board-api/internal/service"
 
 	"github.com/gofiber/fiber/v3"
@@ -17,9 +18,14 @@ func NewDataController(dataService service.DataService) DataController {
 	}
 }
 
-func (d *dataController) GetSkills(c fiber.Ctx) error {
+func (ctrl *dataController) GetSkills(c fiber.Ctx) error {
 	ctx := c.Context()
-	skills, err := d.dataService.GetSkills(ctx)
+	var req web.GetDataRequest
+	if err := c.Bind().Query(&req); err != nil {
+		return err
+	}
+
+	skills, err := ctrl.dataService.GetSkills(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -27,9 +33,14 @@ func (d *dataController) GetSkills(c fiber.Ctx) error {
 	return response.OK(c, "Success get skills", skills)
 }
 
-func (d *dataController) GetCurrencyCodes(c fiber.Ctx) error {
+func (ctrl *dataController) GetCurrencyCodes(c fiber.Ctx) error {
 	ctx := c.Context()
-	currencies, err := d.dataService.GetCurrencyCodes(ctx)
+	var req web.GetDataRequest
+	if err := c.Bind().Query(&req); err != nil {
+		return err
+	}
+
+	currencies, err := ctrl.dataService.GetCurrencyCodes(ctx, req)
 	if err != nil {
 		return err
 	}

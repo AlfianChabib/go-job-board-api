@@ -6,6 +6,6 @@ import (
 )
 
 type DataService interface {
-	GetSkills(ctx context.Context) ([]web.SkillResponse, error)
-	GetCurrencyCodes(ctx context.Context) ([]web.CurrencyResponse, error)
+	GetSkills(ctx context.Context, req web.GetDataRequest) ([]web.SkillResponse, error)
+	GetCurrencyCodes(ctx context.Context, req web.GetDataRequest) ([]web.CurrencyResponse, error)
 }
