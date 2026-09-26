@@ -227,9 +227,9 @@ Base URL: `/api`
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/candidate` | Get candidate profile, skills, and work experiences |
-| `PUT` | `/api/candidate` | Update candidate headline and phone number |
-| `PATCH` | `/api/candidate/avatar` | Upload profile photo (Multipart Form to MinIO) |
+| `GET` | `/api/candidate/profile` | Get candidate profile, skills, and work experiences |
+| `PUT` | `/api/candidate/profile` | Update candidate headline and phone number |
+| `PUT` | `/api/candidate/avatar` | Upload/Replace profile photo (Multipart Form to MinIO) |
 | `DELETE` | `/api/candidate/avatar` | Remove profile photo |
 | `PUT` | `/api/candidate/skills` | Attach skills to candidate profile |
 | `GET` | `/api/candidate/experiences` | Get list of candidate work experiences |

@@ -77,4 +77,13 @@ var (
 	ErrCompanyAlreadyExists = &AppError{Code: http.StatusConflict, Message: "Recruiter already has a registered company"}
 	ErrUploadLogoFailed     = &AppError{Code: http.StatusInternalServerError, Message: "Failed to upload logo"}
 	ErrUploadBannerFailed   = &AppError{Code: http.StatusInternalServerError, Message: "Failed to upload banner"}
+
+	// ==========================================
+	// 9. Job (400, 403, 404)
+	// ==========================================
+	ErrJobNotFound        = &AppError{Code: http.StatusNotFound, Message: "Job not found"}
+	ErrJobForbidden       = &AppError{Code: http.StatusForbidden, Message: "You do not have permission to manage this job posting."}
+	ErrJobClosed          = &AppError{Code: http.StatusBadRequest, Message: "This job posting is already closed."}
+	ErrInvalidJobStatus   = &AppError{Code: http.StatusBadRequest, Message: "Invalid job status. Status must be either OPEN or CLOSED."}
+	ErrInvalidSalaryRange = &AppError{Code: http.StatusBadRequest, Message: "Maximum salary must be greater than or equal to minimum salary."}
 )

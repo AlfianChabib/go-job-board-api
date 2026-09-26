@@ -47,7 +47,10 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 	skillRepository := repository.NewSkillRepository(db)
 	dataService := service.NewDataService(skillRepository)
 	dataController := ProvideDataController(dataService)
-	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController, companyController, dataController)
+	jobRepository := repository.NewJobRepository(db)
+	jobService := service.NewJobService(jobRepository, companyRepository)
+	jobController := ProvideJobController(jobService)
+	app := NewApp(env, structValidator, middlewareMiddleware, authController, candidateController, recruiterController, companyController, dataController, jobController)
 	return app, nil
 }
 
@@ -86,6 +89,10 @@ func ProvideDataController(dataService service.DataService) controller.DataContr
 	return controller.NewDataController(dataService)
 }
 
+func ProvideJobController(jobService service.JobService) controller.JobController {
+	return controller.NewJobController(jobService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -99,3 +106,5 @@ var recruiterSet = wire.NewSet(service.NewRecruiterService, ProvideRecruiterCont
 var companySet = wire.NewSet(repository.NewCompanyRepository, service.NewCompanyService, ProvideCompanyController)
 
 var dataSet = wire.NewSet(repository.NewSkillRepository, service.NewDataService, ProvideDataController)
+
+var jobSet = wire.NewSet(repository.NewJobRepository, service.NewJobService, ProvideJobController)

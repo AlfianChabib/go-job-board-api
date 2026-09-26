@@ -24,6 +24,7 @@ func NewApp(
 	recruiterController controller.RecruiterController,
 	companyController controller.CompanyController,
 	dataController controller.DataController,
+	jobController controller.JobController,
 ) *fiber.App {
 	app := fiber.New(fiber.Config{
 		StructValidator: validate,
@@ -50,6 +51,7 @@ func NewApp(
 		recruiterController,
 		companyController,
 		dataController,
+		jobController,
 	)
 
 	return app

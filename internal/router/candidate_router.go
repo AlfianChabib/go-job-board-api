@@ -17,8 +17,11 @@ func SetupCandidateRoutes(
 	candidate.Use(middleware.RequireRoles("CANDIDATE"))
 
 	candidate.Get("/", candidateController.Get)
+	candidate.Get("/profile", candidateController.Get)
 	candidate.Put("/", candidateController.Update)
+	candidate.Put("/profile", candidateController.Update)
 
+	candidate.Put("/avatar", candidateController.UpdateAvatar)
 	candidate.Patch("/avatar", candidateController.UpdateAvatar)
 	candidate.Delete("/avatar", candidateController.DeleteAvatar)
 
