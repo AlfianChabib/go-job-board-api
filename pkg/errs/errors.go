@@ -86,4 +86,12 @@ var (
 	ErrJobClosed          = &AppError{Code: http.StatusBadRequest, Message: "This job posting is already closed."}
 	ErrInvalidJobStatus   = &AppError{Code: http.StatusBadRequest, Message: "Invalid job status. Status must be either OPEN or CLOSED."}
 	ErrInvalidSalaryRange = &AppError{Code: http.StatusBadRequest, Message: "Maximum salary must be greater than or equal to minimum salary."}
+
+	// ==========================================
+	// 10. Application (400, 403, 404)
+	// ==========================================
+	ErrApplicationNotFound         = &AppError{Code: http.StatusNotFound, Message: "Application not found."}
+	ErrApplicationForbidden        = &AppError{Code: http.StatusForbidden, Message: "You do not have permission to access or modify this application."}
+	ErrInvalidApplicationStatus    = &AppError{Code: http.StatusBadRequest, Message: "Invalid application status."}
+	ErrApplicationAlreadyWithdrawn = &AppError{Code: http.StatusBadRequest, Message: "Application has already been withdrawn."}
 )

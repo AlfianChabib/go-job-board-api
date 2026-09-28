@@ -18,11 +18,10 @@ func SetupJobRoutes(
 	jobs.Get("/:id", jobController.GetJobById)
 
 	// Protected Job Endpoints (Recruiter Only)
-	protectedJobs := jobs.Group("/", middleware.Protected(), middleware.RequireRoles("RECRUITER"))
-	protectedJobs.Post("/", jobController.CreateJob)
-	protectedJobs.Put("/:id", jobController.UpdateJob)
-	protectedJobs.Patch("/:id/status", jobController.UpdateJobStatus)
-	protectedJobs.Delete("/:id", jobController.DeleteJob)
+	jobs.Post("/", middleware.Protected(), middleware.RequireRoles("RECRUITER"), jobController.CreateJob)
+	jobs.Put("/:id", middleware.Protected(), middleware.RequireRoles("RECRUITER"), jobController.UpdateJob)
+	jobs.Patch("/:id/status", middleware.Protected(), middleware.RequireRoles("RECRUITER"), jobController.UpdateJobStatus)
+	jobs.Delete("/:id", middleware.Protected(), middleware.RequireRoles("RECRUITER"), jobController.DeleteJob)
 
 	// Recruiter Job Endpoints (Recruiter Only)
 	recruiterJobs := router.Group("/recruiter/jobs", middleware.Protected(), middleware.RequireRoles("RECRUITER"))

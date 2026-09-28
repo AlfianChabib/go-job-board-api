@@ -1,0 +1,149 @@
+[
+  {
+    "name": "Fajar Nugraha",
+    "email": "fajar.nugraha@gmail.com",
+    "password": "password123",
+    "profile": {
+      "headline": "Senior Go Backend Developer | Distributed Systems & High Throughput Microservices",
+      "bio": "Software engineer dengan pengalaman 5+ tahun membangun backend andal menggunakan Go, PostgreSQL, Redis, dan Kafka. Terbiasa menangani jutaan request harian di sistem e-commerce dan fintech.",
+      "phone": "+6281211223344",
+      "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&h=300&q=80",
+      "resume_url": "https://storage.googleapis.com/job-board-resumes/fajar-nugraha-cv.pdf"
+    },
+    "skills": ["Go", "PostgreSQL", "Redis", "Docker", "Kubernetes", "gRPC", "Kafka", "Linux"],
+    "experiences": [
+      {
+        "company_name": "Tokopedia Global Digital",
+        "position": "Senior Software Engineer - Backend",
+        "start_date": "2023-01-01",
+        "end_date": null,
+        "is_current": true,
+        "description": "Mengembangkan layanan payment checkout berkecepatan tinggi dengan Go, mengurangi latency p99 sebesar 35% dan menangani transaksi puncak flash sale."
+      },
+      {
+        "company_name": "Bukalapak Solusi",
+        "position": "Software Engineer",
+        "start_date": "2020-06-01",
+        "end_date": "2022-12-31",
+        "is_current": false,
+        "description": "Membangun API gateway dan manajemen katalog produk berbasis Golang REST API dan MySQL."
+      }
+    ]
+  },
+  {
+    "name": "Anisa Putri",
+    "email": "anisa.putri@gmail.com",
+    "password": "password123",
+    "profile": {
+      "headline": "Lead Frontend Engineer | React, Next.js, TypeScript & Design Systems",
+      "bio": "Frontend specialist yang berfokus pada web performance, accessibility, dan arsitektur frontend skala besar. Pengalaman 4 tahun memimpin implementasi design system lintas platform.",
+      "phone": "+6281355667788",
+      "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&h=300&q=80",
+      "resume_url": "https://storage.googleapis.com/job-board-resumes/anisa-putri-cv.pdf"
+    },
+    "skills": ["React", "TypeScript", "Next.js", "JavaScript", "HTML5", "CSS3", "Tailwind CSS", "GraphQL"],
+    "experiences": [
+      {
+        "company_name": "Traveloka Indonesia",
+        "position": "Lead Frontend Engineer",
+        "start_date": "2022-03-01",
+        "end_date": null,
+        "is_current": true,
+        "description": "Memimpin tim 6 frontend developer dalam migrasi web hotel booking ke Next.js 14, meningkatkan skor Google Lighthouse SEO & performance ke 98."
+      },
+      {
+        "company_name": "Ruangguru Edukasi",
+        "position": "Frontend Developer",
+        "start_date": "2019-09-01",
+        "end_date": "2022-02-28",
+        "is_current": false,
+        "description": "Mengembangkan platform belajar interaktif berbasis video dan kuis online menggunakan React.js dan Redux Toolkit."
+      }
+    ]
+  },
+  {
+    "name": "Bayu Wicaksono",
+    "email": "bayu.wicaksono@gmail.com",
+    "password": "password123",
+    "profile": {
+      "headline": "DevOps & Cloud Platform Engineer | Kubernetes, Terraform, AWS Certified",
+      "bio": "Cloud and DevOps enthusiast berpengalaman dalam automasi infrastruktur as code (IaC), implementasi GitOps via ArgoCD, dan keamanan cloud architecture di lingkungan produksi AWS & GCP.",
+      "phone": "+6281788990011",
+      "avatar_url": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=300&h=300&q=80",
+      "resume_url": "https://storage.googleapis.com/job-board-resumes/bayu-wicaksono-cv.pdf"
+    },
+    "skills": ["Amazon Web Services", "Kubernetes", "Docker", "Terraform", "CI/CD", "Prometheus", "Grafana", "Linux"],
+    "experiences": [
+      {
+        "company_name": "Gojek SuperApp",
+        "position": "Senior Platform DevOps Engineer",
+        "start_date": "2021-08-01",
+        "end_date": null,
+        "is_current": true,
+        "description": "Mengelola 40+ cluster Kubernetes EKS di multi-region, menghemat biaya cloud sebesar $120.000/tahun melalui auto-scaling dan spot instance orchestration."
+      }
+    ]
+  },
+  {
+    "name": "Dewi Anggraini",
+    "email": "dewi.anggraini@gmail.com",
+    "password": "password123",
+    "profile": {
+      "headline": "Product Manager | Data-Driven E-Commerce & FinTech Growth",
+      "bio": "Product manager dengan rekam jejak meluncurkan produk digital bernilai tinggi dari 0 hingga 1 juta pengguna aktif. Ahli dalam riset pasar kuantitatif, user journey mapping, dan metodologi Scrum Agile.",
+      "phone": "+6281822334455",
+      "avatar_url": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&h=300&q=80",
+      "resume_url": "https://storage.googleapis.com/job-board-resumes/dewi-anggraini-cv.pdf"
+    },
+    "skills": ["Product Management", "Agile Methodologies", "Scrum", "SQL", "User Experience", "Data Analysis"],
+    "experiences": [
+      {
+        "company_name": "Dana Indonesia",
+        "position": "Senior Product Manager - Payment Gateway",
+        "start_date": "2022-01-15",
+        "end_date": null,
+        "is_current": true,
+        "description": "Mengelola siklus pengembangan fitur pembayaran QRIS dan transfer antar bank instan dengan kepuasan pelanggan (CSAT) 4.8/5."
+      },
+      {
+        "company_name": "Blibli Omnichannel",
+        "position": "Associate Product Manager",
+        "start_date": "2019-07-01",
+        "end_date": "2021-12-31",
+        "is_current": false,
+        "description": "Memimpin delivery roadmap produk merchant loyalty dan promo engine kampanye diskon berkala."
+      }
+    ]
+  },
+  {
+    "name": "Rian Kusuma",
+    "email": "rian.kusuma@gmail.com",
+    "password": "password123",
+    "profile": {
+      "headline": "Mobile Application Developer (Flutter & Android Native)",
+      "bio": "Pengembang aplikasi mobile dengan fokus pada arsitektur bersih, performa rendering mulus, dan integrasi offline-first. Memiliki 4 aplikasi terbit di Google Play Store dan Apple App Store.",
+      "phone": "+6281933445566",
+      "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=300&q=80",
+      "resume_url": "https://storage.googleapis.com/job-board-resumes/rian-kusuma-cv.pdf"
+    },
+    "skills": ["Flutter", "Dart", "Android", "Kotlin", "Git", "REST APIs", "SQLite"],
+    "experiences": [
+      {
+        "company_name": "Astra Digital",
+        "position": "Senior Mobile Developer",
+        "start_date": "2022-05-01",
+        "end_date": null,
+        "is_current": true,
+        "description": "Mengembangkan aplikasi servis kendaraan on-demand dengan Flutter dan backend Go, mencatat rating 4.7 dari 200.000+ unduhan."
+      },
+      {
+        "company_name": "JULO Finansial",
+        "position": "Junior Android Developer",
+        "start_date": "2020-02-01",
+        "end_date": "2022-04-30",
+        "is_current": false,
+        "description": "Membangun modul form aplikasi kredit dan verifikasi selfie e-KYC di Android native Kotlin."
+      }
+    ]
+  }
+]

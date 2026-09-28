@@ -19,6 +19,7 @@ func InitializeRoutes(
 	companyController controller.CompanyController,
 	dataController controller.DataController,
 	jobController controller.JobController,
+	applicationController controller.ApplicationController,
 ) {
 	router.Get("/", func(c fiber.Ctx) error {
 		return response.Message(c, fiber.StatusOK, "Hello world!")
@@ -31,5 +32,6 @@ func InitializeRoutes(
 	SetupRecruiterRoutes(api, middleware, recruiterController)
 	SetupCompanyRoutes(api, companyController)
 	SetupJobRoutes(api, middleware, jobController)
+	SetupApplicationRoutes(api, middleware, applicationController)
 	SetupUserRoutes(api)
 }

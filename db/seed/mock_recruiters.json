@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Budi Santoso",
+    "email": "budi.santoso@nusantaratech.id",
+    "password": "password123",
+    "company": {
+      "name": "Nusantara Tech Solusindo",
+      "logo_url": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?auto=format&fit=crop&w=300&h=300&q=80",
+      "banner_url": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&h=400&q=80",
+      "website": "https://nusantaratech.id",
+      "industry": "Information Technology",
+      "employee_size": "201-500",
+      "description": "Perusahaan teknologi terkemuka penyedia solusi enterprise cloud, AI, dan arsitektur backend skala besar di Asia Tenggara.",
+      "location": "Jakarta Selatan, DKI Jakarta"
+    }
+  },
+  {
+    "name": "Sarah Wijaya",
+    "email": "sarah.wijaya@finpay.co.id",
+    "password": "password123",
+    "company": {
+      "name": "FinPay Nusantara Digital",
+      "logo_url": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=300&h=300&q=80",
+      "banner_url": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&h=400&q=80",
+      "website": "https://finpay.co.id",
+      "industry": "Financial Services",
+      "employee_size": "500+",
+      "description": "Fintech unicorn yang menyediakan ekosistem pembayaran digital, payment gateway, dan solusi finansial inklusif.",
+      "location": "Jakarta Pusat, DKI Jakarta"
+    }
+  },
+  {
+    "name": "Dimas Pratama",
+    "email": "dimas.pratama@bukabeli.com",
+    "password": "password123",
+    "company": {
+      "name": "BukaBeli Commerce Indonesia",
+      "logo_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&h=300&q=80",
+      "banner_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&h=400&q=80",
+      "website": "https://bukabeli.com",
+      "industry": "E-Commerce",
+      "employee_size": "500+",
+      "description": "Platform e-commerce omni-channel terdepan yang memberdayakan jutaan UMKM dan jutaan konsumen di Indonesia.",
+      "location": "Tangerang, Banten"
+    }
+  },
+  {
+    "name": "Citra Lestari",
+    "email": "citra.lestari@medikacare.id",
+    "password": "password123",
+    "company": {
+      "name": "Medika Care Healthcare",
+      "logo_url": "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=300&h=300&q=80",
+      "banner_url": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&h=400&q=80",
+      "website": "https://medikacare.id",
+      "industry": "Healthcare",
+      "employee_size": "51-200",
+      "description": "Pionir layanan health-tech modern dengan layanan telekonsultasi dokter spesialis dan pengiriman obat resep instan.",
+      "location": "Bandung, Jawa Barat"
+    }
+  },
+  {
+    "name": "Reza Hendrawan",
+    "email": "reza.hendrawan@kargokilat.id",
+    "password": "password123",
+    "company": {
+      "name": "Kargo Kilat Express",
+      "logo_url": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=300&h=300&q=80",
+      "banner_url": "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&h=400&q=80",
+      "website": "https://kargokilat.id",
+      "industry": "Logistics & Supply Chain",
+      "employee_size": "201-500",
+      "description": "Penyedia logistik cerdas dan pergudangan modern berteknologi IoT dengan jaringan pengiriman cepat di seluruh pulau Indonesia.",
+      "location": "Surabaya, Jawa Timur"
+    }
+  }
+]

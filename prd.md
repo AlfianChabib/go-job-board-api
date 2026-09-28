@@ -66,6 +66,7 @@ Menyimpan master data keahlian/skills yang dapat dipilih oleh pengguna di fronte
 
 - `id` (UUID/Int, Primary Key)
 - `name` (String, Unique) - Nama skill (contoh: "Golang", "PostgreSQL", "React")
+- `abbreviation` (String, Nullable) - Singkatan / akronim skill (contoh: "JS", "TS", "AWS")
 - `created_at`, `updated_at`
 
 ### 3.6. ProfileSkill (Tabel Penghubung / Many-to-Many)
@@ -127,14 +128,27 @@ Menyimpan detail lowongan pekerjaan.
 
 ### 3.10. Application
 
-Tabel transaksional untuk mencatat lamaran (Candidate melamar Job).
+Tabel transaksional untuk mencatat alur rekrutmen dan lamaran kerja (Candidate melamar Job). Didesain untuk skala platform besar (JobStreet / ATS) dengan fitur pelacakan pipeline, pencegahan double-apply, catatan internal, dan ekspektasi gaji.
 
-- `id` (UUID/Int, Primary Key)
-- `job_id` (Foreign Key ke Job)
-- `candidate_id` (Foreign Key ke User)
-- `resume_url` (String)
-- `status` (Enum/String: 'PENDING', 'REVIEWED', 'ACCEPTED', 'REJECTED')
+- `id` (UUIDv7, Primary Key)
+- `job_id` (UUID, Foreign Key ke `jobs`, Indexed, Not Null)
+- `candidate_id` (UUID, Foreign Key ke `users`, Indexed, Not Null)
+- `resume_url` (String, URL resume/CV saat melamar, Not Null)
+- `resume_filename` (String, Nama file asli CV saat diunggah, Nullable)
+- `cover_letter` (Text, Pesan pengantar / motivasi dari kandidat, Nullable)
+- `expected_salary` (BigInt/Int64, Ekspektasi gaji kandidat untuk screening, Nullable)
+- `status` (Enum/String: `APPLIED`, `REVIEWING`, `SHORTLISTED`, `INTERVIEWING`, `OFFERED`, `HIRED`, `REJECTED`, `WITHDRAWN`, Default: `APPLIED`)
+- `recruiter_notes` (Text, Catatan internal tim HR/recruiter - hanya dapat diakses recruiter, Nullable)
+- `rejection_reason` (Text/String, Alasan penolakan dari recruiter, Nullable)
+- `withdrawn_reason` (Text/String, Alasan pembatalan lamaran oleh kandidat, Nullable)
+- `applied_at` (Timestamp, Waktu submit lamaran)
+- `status_updated_at` (Timestamp, Waktu pembaruan status terakhir)
 - `created_at`, `updated_at`
+- `deleted_at` (Timestamp, Soft Delete)
+- **Constraint & Indexing**:
+  - `UNIQUE(job_id, candidate_id)`: Mencegah spam / lamaran ganda (*double apply*) pada lowongan yang sama.
+  - Index gabungan `(job_id, status)`: Mempercepat filtering dan pagination pelamar pada dashboard recruiter.
+  - Index gabungan `(candidate_id, created_at)`: Mempercepat riwayat lamaran kandidat.
 
 ## 4. Spesifikasi API Endpoint
 
@@ -192,12 +206,14 @@ Tabel transaksional untuk mencatat lamaran (Candidate melamar Job).
 
 ### 4.6. Application Management (Candidate & Recruiter)
 
-| Method | Endpoint                       | Keterangan                                                                             | Validasi (Validator)                                 |
-| ------ | ------------------------------ | -------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| POST   | `/api/jobs/:id/applications`   | Melamar pekerjaan dengan membuat resource lamaran baru pada lowongan ini (Candidate). | `resume_url: required, url`                          |
-| GET    | `/api/jobs/:id/applications`   | Melihat daftar pelamar pada lowongan spesifik (Recruiter Only).                        | -                                                    |
-| GET    | `/api/candidate/applications`  | Melihat riwayat daftar lamaran yang diajukan oleh Candidate login (Candidate Only).    | -                                                    |
-| PATCH  | `/api/applications/:id/status` | Update status tahapan lamaran (Recruiter Only).                                        | `status: required, oneof=REVIEWED ACCEPTED REJECTED` |
+| Method | Endpoint                                 | Keterangan                                                                                                                        | Validasi (Validator)                                                                                                                                                                             |
+| ------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| POST   | `/api/jobs/:id/applications`             | Melamar pekerjaan (Candidate Only). Memvalidasi job `OPEN`, cek duplikasi pelamar (*double apply*), dan simpan detail lamaran.  | `resume_url: required, url`, `resume_filename: omitempty,max=255`, `cover_letter: omitempty`, `expected_salary: omitempty,numeric,min=0`                                                        |
+| GET    | `/api/jobs/:id/applications`             | Melihat daftar pelamar pada lowongan spesifik beserta filter pipeline & pagination (Recruiter Only, verifikasi IDOR lowongan).    | Query: `page: omitempty,numeric,min=1`, `limit: omitempty,numeric,min=1,max=100`, `status: omitempty,oneof=APPLIED REVIEWING SHORTLISTED INTERVIEWING OFFERED HIRED REJECTED WITHDRAWN`, `search: omitempty` |
+| GET    | `/api/candidate/applications`            | Melihat riwayat daftar seluruh lamaran yang diajukan oleh Candidate yang login beserta status terbarunya (Candidate Only).       | Query: `page: omitempty,numeric,min=1`, `limit: omitempty,numeric,min=1,max=100`, `status: omitempty,oneof=APPLIED REVIEWING SHORTLISTED INTERVIEWING OFFERED HIRED REJECTED WITHDRAWN`     |
+| GET    | `/api/applications/:id`                  | Melihat detail lengkap satu lamaran kerja (Dapat diakses oleh Recruiter pemilik lowongan atau Candidate yang melamar).            | -                                                                                                                                                                                                |
+| PATCH  | `/api/applications/:id/status`           | Memperbarui tahapan status pelamar (Recruiter Only, verifikasi IDOR). Dapat menyertakan catatan internal & alasan penolakan.     | `status: required, oneof=REVIEWING SHORTLISTED INTERVIEWING OFFERED HIRED REJECTED`, `recruiter_notes: omitempty`, `rejection_reason: omitempty`                                                |
+| PATCH  | `/api/candidate/applications/:id/withdraw` | Menarik / membatalkan lamaran pekerjaan oleh kandidat (Candidate Only). Status berubah menjadi `WITHDRAWN`.                      | `withdrawn_reason: omitempty,max=500`                                                                                                                                                            |
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria)
 

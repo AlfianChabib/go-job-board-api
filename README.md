@@ -248,6 +248,29 @@ Base URL: `/api`
 | `PUT` | `/api/recruiter/company` | Update company information |
 | `PUT` | `/api/recruiter/company/logo` | Upload company logo (MinIO) |
 | `PUT` | `/api/recruiter/company/banner` | Upload company cover banner (MinIO) |
+| `GET` | `/api/recruiter/jobs` | Get all jobs posted by logged-in recruiter |
+
+### 5. Job Management (`/api/jobs`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/jobs` | Browse active job listings with filter & pagination | Public |
+| `GET` | `/api/jobs/:id` | Get job details and company summary | Public |
+| `POST` | `/api/jobs` | Post a new job | Recruiter |
+| `PUT` | `/api/jobs/:id` | Update complete job posting (IDOR protected) | Recruiter |
+| `PATCH` | `/api/jobs/:id/status` | Update job status (`OPEN` / `CLOSED`) | Recruiter |
+| `DELETE` | `/api/jobs/:id` | Delete job posting | Recruiter |
+
+### 6. Application Management (`/api/applications`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/jobs/:id/applications` | Apply for job (prevents double-apply) | Candidate |
+| `GET` | `/api/jobs/:id/applications` | View all applicants for specific job | Recruiter |
+| `GET` | `/api/candidate/applications` | Candidate's application history & pipeline status | Candidate |
+| `GET` | `/api/applications/:id` | View application detail (masked for candidate) | Candidate / Recruiter |
+| `PATCH` | `/api/applications/:id/status` | Advance applicant recruitment pipeline status | Recruiter |
+| `PATCH` | `/api/candidate/applications/:id/withdraw` | Withdraw submitted application | Candidate |
 
 ---
 

@@ -54,6 +54,14 @@ func ProvideDataController(dataService service.DataService) controller.DataContr
 	return controller.NewDataController(dataService)
 }
 
+func ProvideJobController(jobService service.JobService) controller.JobController {
+	return controller.NewJobController(jobService)
+}
+
+func ProvideApplicationController(applicationService service.ApplicationService) controller.ApplicationController {
+	return controller.NewApplicationController(applicationService)
+}
+
 func ProvideStoragerepository(store *minio.Client, env *config.Env) repository.StorageRepository {
 	return repository.NewStorageRepository(store, env.MinioPublicUrl, env.MinioAvatarBucket, env.MinioCvBucket)
 }
@@ -89,6 +97,18 @@ var dataSet = wire.NewSet(
 	ProvideDataController,
 )
 
+var jobSet = wire.NewSet(
+	repository.NewJobRepository,
+	service.NewJobService,
+	ProvideJobController,
+)
+
+var applicationSet = wire.NewSet(
+	repository.NewApplicationRepository,
+	service.NewApplicationService,
+	ProvideApplicationController,
+)
+
 func InitializeApp(env *config.Env) (*fiber.App, error) {
 	wire.Build(
 		database.OpenConnection,
@@ -102,6 +122,8 @@ func InitializeApp(env *config.Env) (*fiber.App, error) {
 		recruiterSet,
 		companySet,
 		dataSet,
+		jobSet,
+		applicationSet,
 		NewApp,
 	)
 	return nil, nil
