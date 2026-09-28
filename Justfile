@@ -50,10 +50,26 @@ down:
 logs service="":
   docker compose logs -f {{service}}
 
-# Menjalankan seluruh unit test
-# Run all unit tests
-test:
-  go test -v ./...
+# Menjalankan seluruh unit test (opsional: spesifik package, contoh: `just test ./internal/service/...`)
+# Run unit tests (optional: specific package, e.g. `just test ./internal/service/...`)
+test pkg="./...":
+  go test -v {{pkg}}
+
+# Menjalankan unit test secara ringkas beserta ringkasan coverage per package
+# Run unit tests concisely with coverage summary per package
+test-short pkg="./...":
+  go test -cover {{pkg}}
+
+# Menjalankan unit test secara detail beserta persentase coverage
+# Run verbose unit tests with coverage percentage
+test-cover pkg="./...":
+  go test -v -cover {{pkg}}
+
+# Menjalankan unit test dan membuat laporan coverage dalam bentuk HTML (coverage.html)
+# Run unit tests and generate an HTML coverage report (coverage.html)
+test-cover-html:
+  go test -coverprofile=coverage.out ./...
+  go tool cover -html=coverage.out -o coverage.html
 
 # Rapikan dan verifikasi dependensi Go modules
 # Tidy and verify Go module dependencies

@@ -40,6 +40,15 @@ func TestNilIfEmpty(t *testing.T) {
 	})
 }
 
+func TestNilIfZero(t *testing.T) {
+	var zero int64 = 0
+	var nonZero int64 = 42
+
+	assert.Nil(t, utils.NilIfZero(&zero))
+	assert.Equal(t, &nonZero, utils.NilIfZero(&nonZero))
+	assert.Nil(t, utils.NilIfZero[int64](nil))
+}
+
 func TestCleanseEmpty(t *testing.T) {
 	emptyStr := ""
 	pStr := &emptyStr
@@ -51,4 +60,23 @@ func TestCleanseEmpty(t *testing.T) {
 	utils.CleanseEmpty(&pValStr)
 	assert.NotNil(t, pValStr)
 	assert.Equal(t, "active", *pValStr)
+
+	var nilPtr *string
+	utils.CleanseEmpty(&nilPtr)
+	assert.Nil(t, nilPtr)
+
+	utils.CleanseEmpty[string](nil)
+}
+
+func TestCleanseEmptyString(t *testing.T) {
+	emptyStr := ""
+	pStr := &emptyStr
+	utils.CleanseEmptyString(&pStr)
+	assert.Nil(t, pStr)
+
+	valStr := "non-empty"
+	pValStr := &valStr
+	utils.CleanseEmptyString(&pValStr)
+	assert.NotNil(t, pValStr)
+	assert.Equal(t, "non-empty", *pValStr)
 }
